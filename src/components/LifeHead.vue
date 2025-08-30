@@ -23,12 +23,12 @@
         </div>
 
         <div class="wallet-connect" id="wallet-app">
-          <button class="wallet-info" v-if="!isConnected" @click="openModal">
+          <button class="wallet-info" v-if="!accountInfo?.address" @click="openModal">
             <img v-if="isMobile" src="@/assets/walleticon.png" alt="Lifeguard Logo" />
             <span v-if="!isMobile">{{ t('connect_wallet') }}</span>
           </button>
           <button class="wallet-info wallet-target" v-else @click="showWalletInfo">
-            <img v-if="walletIcon" :src="walletIcon" alt="Lifeguard Logo" />
+            <img :src="walletInfo.walletInfo.icon" alt="Lifeguard Logo" />
             <span v-if="!isMobile">{{ formattedAddress }}</span>
           </button>
           <!-- 提示框（条件渲染） -->
@@ -80,9 +80,12 @@
 <script setup>
 import { ref, onMounted, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { createWeb3Modal } from "@web3modal/wagmi"
-import { watchConnections, disconnect } from "@wagmi/core";
-import { projectId, config } from '../web3/index.js'
+
+import { useDisconnect, useAppKit, useAppKitAccount, useWalletInfo } from "@reown/appkit/vue";
+const { disconnect } = useDisconnect()
+const { open } = useAppKit();
+const accountInfo = useAppKitAccount();
+const walletInfo = useWalletInfo();
 
 import { useRouter } from 'vue-router'
 const router = useRouter()
@@ -90,14 +93,6 @@ const router = useRouter()
 onMounted(async () => {
   checkScreenSize()
   window.addEventListener('resize', checkScreenSize)
-
-  modal.value = createWeb3Modal({
-    themeMode: "light",
-    wagmiConfig: config,
-    projectId,
-    enableAnalytics: true,
-    enableOnramp: true,
-  });
 })
 
 // 定义切换语言的函数
@@ -110,59 +105,26 @@ function setLang(lang) {
 }
 
 // web3
-const modal = ref(null)
-const address = ref(null)
-const walletIcon = ref(null)
-const isConnected = ref(false)
 const formattedAddress = ref(null)
 // 格式化地址
 formattedAddress.value = computed(() => {
-  if (!address.value) return ''
-  return `${address.value.slice(0, 6)}...${address.value.slice(-4)}`
+  let address = accountInfo.value?.address
+  if (!address) return ''
+  return `${address.slice(0, 6)}...${address.slice(-4)}`
 })
-const openModal = () => {
-  if (modal.value) {
-    modal.value.open()
-  }
-}
+
+// 打开连接模态框
+const openModal = () => open()
+
+// 断开连接
 const disConnect = async () => {
   try {
-    await disconnect(config)
-    clearConnections()
-    address.value = null
-    isConnected.value = false
+    await disconnect()
     showTooltip.value = false
   } catch (error) {
-    console.log("=============", error)
+    console.error("Error during disconnect:", error);
   }
 }
-function clearConnections() {
-  config.state.connections.forEach((item) => {
-    config.state.connections.delete(item.connector.uid);
-  });
-}
-function checkConnections() {
-  const lastEntry = Array.from(config.state.connections).pop();
-  config.state.connections.forEach((item, index) => {
-    if (index != lastEntry[0]) {
-      config.state.connections.delete(item.connector.uid);
-    }
-  });
-}
-watchConnections(config, {
-  async onChange(data) {
-    checkConnections()
-    if (data.length) {
-      address.value = data.at(-1).accounts[0]
-      walletIcon.value = data.at(-1).connector.icon ?? ''
-      isConnected.value = true
-    } else {
-      clearConnections()
-      address.value = null
-      isConnected.value = false
-    }
-  },
-});
 
 // 屏幕尺寸
 const screenWidth = ref(0)

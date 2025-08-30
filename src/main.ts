@@ -2,10 +2,12 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import i18n from './i18n'
 import router from './router'
-import { WagmiConfig } from '@wagmi/core' // 引入 Wagmi 配置组件
-import { config } from './web3' // 引入刚才创建的配置
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
+
+import { WagmiPlugin } from '@wagmi/vue'
+import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
+import { wagmiAdapter } from './web3/index'
 
 const app = createApp(App)
 
@@ -16,6 +18,9 @@ app.use(ElementPlus)
 
 app.use(router)
 
-app.use(WagmiConfig, { config })
+// 挂载Wagmi
+const queryClient = new QueryClient()
+app.use(WagmiPlugin, { config: wagmiAdapter.wagmiConfig })
+app.use(VueQueryPlugin, { queryClient })
 
 app.mount('#app')
