@@ -53,4 +53,20 @@ const router = createRouter({
   routes
 })
 
+// 用于标记是否是初始加载（页面刷新）
+let isInitialLoad = true
+
+router.beforeEach((to, from, next) => {
+  // 识别刷新的条件：初始加载 + from是初始状态（无name属性或为空对象）
+  const isRefresh = isInitialLoad && (from.name === undefined || Object.keys(from).length === 0)
+  
+  if (isRefresh && !to.meta.isHome) {
+    isInitialLoad = false
+    next('/') // 跳转到首页
+  } else {
+    isInitialLoad = false
+    next()
+  }
+})
+
 export default router

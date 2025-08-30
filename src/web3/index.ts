@@ -1,5 +1,5 @@
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { mainnet, polygon, base, type AppKitNetwork } from '@reown/appkit/networks'
+import { type AppKitNetwork } from '@reown/appkit/networks'
 
 export const projectId = "669b5cd517fea9a8736980e7dd8f5900"
 if (!projectId) {
