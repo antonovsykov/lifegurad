@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-const Orders = require('../models/orders');
+import Orders from '../models/orders.js';
 
 // 获取所有订单
 router.get('/', async (req, res) => {
@@ -21,9 +21,9 @@ router.get('/', async (req, res) => {
 });
 
 // 根据ID获取订单
-router.get('/:id', async (req, res) => {
+router.get('/id/:id', async (req, res) => {
   try {
-    const order = await Orders.getProductById(req.params.id);
+    const order = await Orders.getById(req.params.id);
     res.json({
       success: true,
       data: order
@@ -36,16 +36,33 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// 根据Address获取订单
+router.get('/address/:address/:type', async (req, res) => {
+  try {
+    const orders = await Orders.getByAddress(req.params.address, req.params.type);
+    res.json({
+      success: true,
+      data: orders
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
 // 创建订单订单
 router.post('/', async (req, res) => {
   try {
-    const { ins_id, wallet_adr, share, total, hash, email, month } = req.body;
-    await Orders.create({ ins_id, wallet_adr, share, total, hash, email, month });
+    const { ins_id, wallet_adr, duration, share, money, total, hash, email } = req.body;
+    await Orders.create({ ins_id, wallet_adr, duration, share, money, total, hash, email });
     res.json({
       success: true,
       message: "Create Success"
     });
   } catch (error) {
+    console.log("===================error==================", error)
     res.status(500).json({
       success: false,
       message: "Create Failed"
@@ -53,6 +70,4 @@ router.post('/', async (req, res) => {
   }
 });
 
-
-
-module.exports = router;
+export default router;

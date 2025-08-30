@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
 
-const Insurance = require('../models/insurance');
+import Insurance from '../models/insurance.js';
 
 // 获取所有保险
 router.get('/', async (req, res) => {
@@ -20,4 +20,4 @@ router.get('/', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

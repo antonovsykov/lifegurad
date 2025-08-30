@@ -1,5 +1,5 @@
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
 const app = express();
 
 // 解析命令行参数来获取端口号
@@ -12,12 +12,19 @@ app.use(cors());
 app.use(express.json());
 
 // 配置路由
-const insuranceRoutes = require('./routes/insurance');
-const ordersRoutes = require('./routes/orders');
+import insuranceRoutes from './routes/insurance.js';
+import ordersRoutes from './routes/orders.js';
+import claimsRoutes from './routes/claims.js';
+import uploadRoutes from './routes/upload.js';
 
 // 使用路由
 app.use('/api/insurance', insuranceRoutes);
 app.use('/api/orders', ordersRoutes);
+app.use('/api/claims', claimsRoutes);
+app.use('/api/upload', uploadRoutes);
+
+// 设置静态文件目录
+app.use('/uploads', express.static('uploads'));
 
 // 设置静态文件目录
 app.use(express.static('../dist'));

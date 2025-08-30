@@ -68,7 +68,7 @@
       <span class="close" @click="closeModal">&times;</span>
       <h2 id="modal-title"></h2>
       <label data-en="Duration (months):" data-zh="持续时间(月)：" for="duration">Duration (months):</label>
-      <select id="duration" @change="calculateTotal">
+      <select id="duration" v-model="buymodel.duration" @change="calculateTotal">
         <option data-en="1 Month" data-zh="1 月" value="1">1 Month</option>
         <option data-en="3 Month" data-zh="3 月" value="3">3 Months</option>
         <option data-en="6 Month" data-zh="6 月" value="6">6 Months</option>
@@ -76,10 +76,10 @@
       </select>
 
       <label data-en="Shares:" data-zh="份额：" for="shares">Shares:</label>
-      <input type="number" id="shares" min="1" value="1" @change="calculateTotal">
+      <input type="number" id="shares" v-model="buymodel.share" min="1" value="1" @change="calculateTotal">
 
       <label data-en="Email:" data-zh="邮箱：" for="email">Email:</label>
-      <input type="email" id="email">
+      <input type="email" id="email" v-model="buymodel.email">
 
       <div class="total">
         <span data-en="Total: " data-zh="总共：">Total: </span>
@@ -102,15 +102,30 @@
 
 <script setup>
 import { watch, onMounted, onBeforeMount, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { WEBUI_BASE_URL } from '../api/constants'
 import { ElMessage } from 'element-plus'
 
-const PRODUCTS = ref([]);
-
-// 定义切换语言的函数
+import { useI18n } from 'vue-i18n'
 const { t, locale } = useI18n();
+
+import { useAppKit, useAppKitAccount } from "@reown/appkit/vue";
+const { open } = useAppKit();
+const accountInfo = useAppKitAccount();
+
+const buymodel = ref({
+  ins_id: "",
+  wallet_adr: "",
+  duration: 1,
+  share: 1,
+  money: 0,
+  total: 0,
+  hash: "",
+  email: "",
+  status: 0
+})
+
+const PRODUCTS = ref([]);
 
 const searchProducts = (event) => {
   let queryVal = event.target.value.toLowerCase();
@@ -129,15 +144,22 @@ const searchProducts = (event) => {
 
 let selectedProduct = null;
 function openModal(index) {
-  selectedProduct = PRODUCTS.value[index];
-  let modalTitle = document.getElementById('modal-title');
-  modalTitle.setAttribute('data-en', selectedProduct.title_en);
-  modalTitle.setAttribute('data-zh', selectedProduct.title_zh);
-  document.getElementById('total-amount').textContent = `${selectedProduct.deposit} $`;
-  document.getElementById('view-details-id').setAttribute("data-id", selectedProduct.id);
-  document.getElementById('purchase-modal').style.display = 'flex';
-  checkDomLang();
-  calculateTotal();
+  if (accountInfo.value.address) {
+    selectedProduct = PRODUCTS.value[index];
+    buymodel.value.duration = 1
+    buymodel.value.share = 1
+    let modalTitle = document.getElementById('modal-title');
+    modalTitle.setAttribute('data-en', selectedProduct.title_en);
+    modalTitle.setAttribute('data-zh', selectedProduct.title_zh);
+    document.getElementById('total-amount').textContent = `${selectedProduct.deposit} $`;
+    document.getElementById('view-details-id').setAttribute("data-id", selectedProduct.id);
+    document.getElementById('purchase-modal').style.display = 'flex';
+    checkDomLang();
+    calculateTotal();
+  } else {
+    open()
+  }
+
 }
 
 const closeModal = () => {
@@ -145,12 +167,15 @@ const closeModal = () => {
 }
 
 const calculateTotal = () => {
-  const duration = document.getElementById('duration').value;
-  const shares = document.getElementById('shares').value;
-  const baseAmount = selectedProduct.deposit;
-  const total = baseAmount * duration * shares;
-  document.getElementById('total-amount').textContent = `${total}$`;
-  document.getElementById('total-amount-2').textContent = `${total}`;
+  buymodel.value.ins_id = selectedProduct.id
+  buymodel.value.money = selectedProduct.deposit
+  const duration = buymodel.value.duration
+  const shares = buymodel.value.share
+  const baseAmount = selectedProduct.deposit
+  const total = baseAmount * duration * shares
+  document.getElementById('total-amount').textContent = `${total}$`
+  document.getElementById('total-amount-2').textContent = `${total}`
+  buymodel.value.total = total
 }
 
 // 获取路由实例
@@ -212,24 +237,24 @@ const getInsurance = async () => {
 }
 
 const creatOrder = async () => {
-  const md = 1;
+  buymodel.value.wallet_adr = accountInfo.value.address
   await fetch(`${WEBUI_BASE_URL}/api/orders`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({
-      md: md
-    })
+    body: JSON.stringify(buymodel.value)
   }).then(async (res) => {
     if (res.ok) {
       const data = await res.json();
       if (data.success) {
-        PRODUCTS.value = data.data;
+        ElMessage.success(t('paysuccess'))
+        closeModal()
       }
     }
   }).catch((err) => {
-    console.log("===========err============", err);
+    console.log("=======payerr=====", err)
+    ElMessage.success(t('payfailed'))
   });
 }
 
@@ -237,14 +262,14 @@ const copyText = (text) => {
   try {
     // 复制文本
     return navigator.clipboard.writeText(text).then(() => {
-      ElMessage.success('文本复制成功');
+      ElMessage.success(t('copysuccess'));
       return true;
     }).catch(() => {
-      ElMessage.error('复制失败');
+      ElMessage.error(t('copyfailed'));
       return false;
     });
   } catch (err) {
-    ElMessage.error('复制过程出错');
+    ElMessage.error(t('copyfailed'));
     return false;
   }
 }
@@ -340,7 +365,7 @@ h2.section-title {
 .product-card {
   position: relative;
   overflow: hidden;
-  min-height: 170px;
+  min-height: 130px;
   border-radius: var(--card-radius);
   color: #fff;
   display: flex;
@@ -469,7 +494,8 @@ h2.section-title {
   width: 100%;
   padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 8px
+  border-radius: 8px;
+  box-sizing: border-box;
 }
 
 .modal-content .total {

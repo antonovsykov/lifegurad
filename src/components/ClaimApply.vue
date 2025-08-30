@@ -1,138 +1,123 @@
 <template>
   <div class="container">
-    <h1>理赔申请</h1>
-    <p class="subtitle">提交和管理您的理赔申请</p>
+    <h1>{{ t('claimapplication') }}</h1>
+    <p class="subtitle">{{ t('submitandmanageyourclaimapplications') }}</p>
 
     <div class="card">
       <div class="card-header">
-        <div class="card-title">理赔历史</div>
+        <div class="card-title">{{ t('claimshistory') }}</div>
         <div class="filters">
-          <button class="filter-btn active" data-claim-filter="all">全部</button>
-          <button class="filter-btn" data-claim-filter="pending">待处理</button>
-          <button class="filter-btn" data-claim-filter="approved">已通过</button>
-          <button class="filter-btn" data-claim-filter="partial">分期支付</button>
+          <button class="filter-btn active" data-claim-filter="all" @click="getTypeMyClaims('all')">{{ t('all')
+          }}</button>
+          <button class="filter-btn" data-claim-filter="pending" @click="getTypeMyClaims('pending')">{{ t('pending')
+          }}</button>
+          <button class="filter-btn" data-claim-filter="approved" @click="getTypeMyClaims('approved')">{{ t('approved')
+          }}</button>
+          <button class="filter-btn" data-claim-filter="partial" @click="getTypeMyClaims('partial')">{{ t('instalpay')
+          }}</button>
         </div>
       </div>
 
       <table>
         <thead>
           <tr>
-            <th>保单类型</th>
-            <th>提交时间</th>
-            <th>保单有效期</th>
-            <th>1期赔付金额</th>
-            <th>2期赔付金额</th>
-            <th>总金额</th>
-            <th>状态</th>
-            <th>操作</th>
+            <th>{{ t('insurancetype') }}</th>
+            <th>{{ t('submittime') }}</th>
+            <th>{{ t('policyterm') }}</th>
+            <th>{{ t('onestpayoutinstallment') }}</th>
+            <th>{{ t('twostpayoutinstallment') }}</th>
+            <th>{{ t('totalamount') }}</th>
+            <th>{{ t('status') }}</th>
+            <th>{{ t('action') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr data-claim-status="approved">
-            <td>感冒医疗险</td>
-            <td>2023-10-15 14:30</td>
-            <td>12个月</td>
-            <td>2,500 LGUARD</td>
-            <td>2,500 LGUARD</td>
-            <td>5,000 LGUARD</td>
-            <td><span class="status-badge status-fully-paid">全部支付</span></td>
-            <td><button class="action-btn btn-primary" @click="openDetailModal('感冒医疗险')">查看详情</button></td>
-          </tr>
-          <tr data-claim-status="pending">
-            <td>航班延误险</td>
-            <td>2023-10-18 09:15</td>
-            <td>3个月</td>
-            <td>-</td>
-            <td>-</td>
-            <td>2,500 LGUARD</td>
-            <td><span class="status-badge status-pending">审核中</span></td>
-            <td><button class="action-btn btn-primary" @click="openDetailModal('航班延误险')">查看详情</button></td>
-          </tr>
-          <tr data-claim-status="approved">
-            <td>手机碎屏电池衰减险</td>
-            <td>2023-09-05 16:45</td>
-            <td>12个月</td>
-            <td>8,000 LGUARD</td>
-            <td>-</td>
-            <td>8,000 LGUARD</td>
-            <td><span class="status-badge status-partial">1期已支付</span></td>
-            <td><button class="action-btn btn-primary" @click="openDetailModal('手机碎屏电池衰减险')">查看详情</button></td>
-          </tr>
-          <tr data-claim-status="approved">
-            <td>外卖延误险</td>
-            <td>2023-08-22 19:30</td>
-            <td>6个月</td>
-            <td>-</td>
-            <td>-</td>
-            <td>3,000 LGUARD</td>
-            <td><span class="status-badge status-rejected">已拒绝</span></td>
-            <td><button class="action-btn btn-primary" @click="openDetailModal('外卖延误险')">查看详情</button></td>
-          </tr>
-          <tr data-claim-status="approved" data-claim-payment="partial">
-            <td>运动步数激励险</td>
-            <td>2023-11-01 10:20</td>
-            <td>1个月</td>
-            <td>1,500 LGUARD</td>
-            <td>1,500 LGUARD</td>
-            <td>3,000 LGUARD</td>
-            <td><span class="status-badge status-partial">1期已支付</span></td>
-            <td><button class="action-btn btn-primary" @click="openDetailModal('运动步数激励险')">查看详情</button></td>
-          </tr>
+          <template v-if="myClaims.length > 0">
+            <tr data-claim-status="approved" v-for="(item, index) in myClaims" :key="index">
+              <td :data-en="item.title_en" :data-zh="item.title_zh">{{ item.title_en }}</td>
+              <td>{{ formateDate(item.submit_time) }}</td>
+              <td>{{ item.duration + t('month') }}</td>
+              <td>{{ item.first_money }} LGUARD</td>
+              <td>{{ item.second_money }} LGUARD</td>
+              <td>{{ parseInt(item.first_money) + parseInt(item.second_money) }} LGUARD</td>
+              <td>
+                <span v-if="item.status == 3" class="status-badge status-fully-paid">{{ t('payall') }}</span>
+                <span v-if="item.status == 1" class="status-badge status-pending">{{ t('underreview') }}</span>
+                <span v-if="item.status == 2" class="status-badge status-partial">{{ t('onepaid') }}</span>
+                <span v-if="item.status == 0" class="status-badge status-rejected">{{ t('rejected') }}</span>
+              </td>
+              <td><button class="action-btn btn-primary" @click="openDetailModal(item)">{{ t('viewdetails') }}</button>
+              </td>
+            </tr>
+          </template>
+          <template v-else>
+            <tr data-claim-status="approved">
+              <td class="nodata" colspan="8">{{ t('nodata') }}</td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
     <div class="detail-modal" id="detailModal">
       <div class="detail-content">
         <div class="modal-header">
-          <h2>理赔详情</h2>
+          <h2>{{ t('claimdetails') }}</h2>
           <button class="close-btn" @click="closeDetailModal">&times;</button>
         </div>
         <div class="detail-body">
           <div class="form-group">
-            <label>保单类型</label>
-            <p id="detailPolicyType"></p>
+            <label>{{ t('policytype') }}</label>
+            <p id="detailPolicyType">{{ insTitle }}</p>
           </div>
 
           <div class="form-group">
-            <label>提交时间</label>
-            <p id="detailSubmitTime"></p>
+            <label>{{ t('submittime') }}</label>
+            <p id="detailSubmitTime">{{ formateDate(selPolicy.submit_time) }}</p>
           </div>
 
           <div class="form-group">
-            <label>总赔付金额</label>
-            <p id="detailTotalAmount"></p>
+            <label>{{ t('总赔付金额') }}</label>
+            <p id="detailTotalAmount">{{ parseInt(selPolicy.first_money) + parseInt(selPolicy.second_money) }} LGUARD</p>
           </div>
 
           <div class="form-group">
-            <label>当前状态</label>
-            <p id="detailStatus"></p>
+            <label>{{ t('currentstatus') }}</label>
+            <p v-if="selPolicy.status == 0" class="status-rejected2">{{ t('rejected') }}</p>
+            <p v-if="selPolicy.status == 1" class="status-pending2">{{ t('underreview') }}</p>
+            <p v-if="selPolicy.status == 2" class="status-partial2">{{ t('onepaid') }}</p>
+            <p v-if="selPolicy.status == 3" class="status-fully-paid2">{{ t('payall') }}</p>
           </div>
 
-          <div class="payment-stages">
-            <div class="payment-stage" id="stage1">
-              <div class="stage-label">第一期</div>
-              <div class="stage-amount" id="stage1Amount"></div>
-              <span class="stage-status status-badge" id="stage1Status"></span>
+          <div class="payment-stages" v-if="selPolicy.status > 1">
+            <div class="payment-stage">
+              <div class="stage-label">{{ t('firstinstallment') }}</div>
+              <div class="stage-amount"></div>
+              <span class="stage-status status-fully-paid">{{ t('paid') }}</span>
             </div>
-            <div class="payment-stage" id="stage2">
-              <div class="stage-label">第二期</div>
-              <div class="stage-amount" id="stage2Amount"></div>
-              <span class="stage-status status-badge" id="stage2Status"></span>
+            <div class="payment-stage">
+              <div class="stage-label">{{ t('secondinstallment') }}</div>
+              <div class="stage-amount"></div>
+              <span v-if="selPolicy.status == 2" class="stage-status status-pending">{{ t('pendingpayment') }}</span>
+              <span v-if="selPolicy.status == 3" class="stage-status status-fully-paid">{{ t('paid') }}</span>
             </div>
           </div>
 
           <div class="payment-timeline">
             <div class="timeline-item">
-              <div class="timeline-date">2023-10-15 14:30</div>
-              <div class="timeline-content">理赔申请提交</div>
+              <div class="timeline-date">{{ formateDate(selPolicy.submit_time) }}</div>
+              <div class="timeline-content">{{ t('submissionofclaimapply') }}</div>
             </div>
-            <div class="timeline-item">
-              <div class="timeline-date">2023-10-16 09:00</div>
-              <div class="timeline-content">审核通过，第一期支付完成</div>
+            <div class="timeline-item" v-if="selPolicy.status > 1">
+              <div class="timeline-date">{{ formateDate(selPolicy.first_time) }}</div>
+              <div class="timeline-content">{{ t('approvedfirstpaycompleted') }}</div>
             </div>
-            <div class="timeline-item">
-              <div class="timeline-date">2023-11-16 09:00</div>
-              <div class="timeline-content">第二期支付完成</div>
+            <div class="timeline-item" v-if="selPolicy.status > 2">
+              <div class="timeline-date">{{ formateDate(selPolicy.second_time) }}</div>
+              <div class="timeline-content">{{ t('secondpaycompleted') }}</div>
+            </div>
+            <div class="timeline-item" v-if="selPolicy.status == 0">
+              <div class="timeline-date">{{ formateDate(selPolicy.reject_time) }}</div>
+              <div class="timeline-content">{{ t('claimapplyrejectd') }}</div>
             </div>
           </div>
         </div>
@@ -142,22 +127,81 @@
 </template>
 
 <script setup>
-// 打开详情模态（示例数据）
+import { onMounted, watch, ref } from 'vue'
+import { WEBUI_BASE_URL } from '../api/constants'
+
+import dayjs from 'dayjs';
+import { useAppKitAccount } from "@reown/appkit/vue";
+const accountInfo = useAppKitAccount();
+
+// 定义切换语言的函数
+import { useI18n } from 'vue-i18n'
+const { t, locale } = useI18n();
+
+onMounted(async () => {
+  await getMyClaims()
+  checkDomLang()
+})
+
+watch(
+  locale, (newLocale, oldLocale) => {
+    console.log(`语言从 ${oldLocale} 切换到了 ${newLocale}`)
+    checkDomLang()
+  },
+  { immediate: false } // 可选：是否在初始化时立即执行一次
+)
+
+
+const formateDate = (datetime) => {
+  return dayjs(datetime).format('YYYY-MM-DD HH:mm')
+}
+
+function checkDomLang() {
+  let currentLang = locale.value
+  document.querySelectorAll('[data-en]').forEach(el => {
+    const en = el.getAttribute('data-en');
+    const zh = el.getAttribute('data-zh');
+    if (currentLang === 'en' && en) el.textContent = en;
+    if (currentLang === 'zh' && zh) el.textContent = zh;
+  });
+}
+
+// 获取我的订单
+const typeSel = ref("all")
+const myClaims = ref([])
+const getMyClaims = async () => {
+  let type = typeSel.value
+  const address = accountInfo.value.address
+  if (address) {
+    await fetch(`${WEBUI_BASE_URL}/api/claims/address/${address}/${type}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(async (res) => {
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success) {
+          myClaims.value = data.data
+        }
+      }
+    }).catch((err) => {
+      console.log("===========err============", err);
+    });
+  }
+}
+const getTypeMyClaims = async (type) => {
+  typeSel.value = type
+  await getMyClaims()
+}
+
+// 打开详情模态（示例数据
+const selPolicy = ref({})
+const insTitle = ref('')
 const openDetailModal = (policy) => {
-  // 这里可以根据policy获取实际数据，这里用示例
-  document.getElementById('detailPolicyType').textContent = policy;
-  document.getElementById('detailSubmitTime').textContent = '2023-10-15 14:30';
-  document.getElementById('detailTotalAmount').textContent = '5,000 LGUARD';
-  document.getElementById('detailStatus').textContent = '全部支付';
-
-  document.getElementById('stage1Amount').textContent = '2,500 LGUARD';
-  document.getElementById('stage1Status').textContent = '已支付';
-  document.getElementById('stage1Status').classList.add('status-paid');
-
-  document.getElementById('stage2Amount').textContent = '2,500 LGUARD';
-  document.getElementById('stage2Status').textContent = '已支付';
-  document.getElementById('stage2Status').classList.add('status-paid');
-
+  selPolicy.value = policy
+  let currentLang = locale.value
+  insTitle.value = currentLang === 'en' ? policy.title_en : policy.title_zh
   document.getElementById('detailModal').style.display = 'flex';
 }
 // 关闭详情模态
@@ -180,6 +224,7 @@ const closeDetailModal = () => {
   padding: 25px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   margin-bottom: 25px;
+  overflow-x: auto;
 }
 
 .card-header {
@@ -230,6 +275,7 @@ td {
   padding: 12px 15px;
   text-align: left;
   border-bottom: 1px solid #eee;
+  font-size: 14px;
 }
 
 th {
@@ -257,7 +303,7 @@ tr:hover {
 .detail-content {
   background: white;
   border-radius: 12px;
-  width: 600px;
+  width: 500px;
   max-width: 90%;
   max-height: 80vh;
   overflow-y: auto;
@@ -270,10 +316,14 @@ tr:hover {
   border-radius: 20px;
   font-size: 12px;
   font-weight: 500;
+  white-space: nowrap;
 }
 
 .status-fully-paid {
   background: rgba(46, 204, 113, 0.15);
+  color: #27ae60;
+}
+.status-fully-paid2 {
   color: #27ae60;
 }
 
@@ -281,9 +331,15 @@ tr:hover {
   background: rgba(243, 156, 18, 0.15);
   color: #e67e22;
 }
+.status-pending2 {
+  color: #e67e22;
+}
 
 .status-partial {
   background: rgba(155, 89, 182, 0.15);
+  color: #8e44ad;
+}
+.status-partial2 {
   color: #8e44ad;
 }
 
@@ -291,6 +347,10 @@ tr:hover {
   background: rgba(231, 76, 60, 0.15);
   color: #c0392b;
 }
+.status-rejected2 {
+  color: #c0392b;
+}
+
 
 .btn-primary {
   background: var(--primary);
@@ -305,6 +365,7 @@ tr:hover {
   font-size: 14px;
   font-weight: 500;
   transition: all 0.3s;
+  white-space: nowrap;
 }
 
 .modal-header {
@@ -316,6 +377,10 @@ tr:hover {
   border-bottom: 1px solid #eee;
 }
 
+.modal-header h2 {
+  line-height: 1px;
+}
+
 .close-btn {
   background: none;
   border: none;
@@ -325,13 +390,20 @@ tr:hover {
 }
 
 .form-group {
-  margin-bottom: 20px;
+  color: #333;
+  line-height: 1.6;
+  font-size: 14px;
+  margin-bottom: 30px;
 }
 
 .form-group label {
   display: block;
   margin-bottom: 8px;
-  font-weight: 500;
+  font-weight: 600;
+}
+
+.form-group p {
+  line-height: 2px;
 }
 
 .form-group input,
@@ -415,5 +487,11 @@ tr:hover {
 
 .timeline-content {
   margin-top: 5px;
+}
+
+.nodata {
+  line-height: 100px;
+  text-align: center;
+  color: #888888;
 }
 </style>
