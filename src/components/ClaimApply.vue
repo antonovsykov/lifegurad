@@ -7,13 +7,13 @@
       <div class="card-header">
         <div class="card-title">{{ t('claimshistory') }}</div>
         <div class="filters">
-          <button class="filter-btn active" data-claim-filter="all" @click="getTypeMyClaims('all')">{{ t('all')
+          <button :class="['filter-btn', typeSel=='all' ? 'active' : '']" data-claim-filter="all" @click="getTypeMyClaims('all')">{{ t('all')
           }}</button>
-          <button class="filter-btn" data-claim-filter="pending" @click="getTypeMyClaims('pending')">{{ t('pending')
+          <button :class="['filter-btn', typeSel=='pending' ? 'active' : '']" data-claim-filter="pending" @click="getTypeMyClaims('pending')">{{ t('pending')
           }}</button>
-          <button class="filter-btn" data-claim-filter="approved" @click="getTypeMyClaims('approved')">{{ t('approved')
+          <button :class="['filter-btn', typeSel=='approved' ? 'active' : '']" data-claim-filter="approved" @click="getTypeMyClaims('approved')">{{ t('approved')
           }}</button>
-          <button class="filter-btn" data-claim-filter="partial" @click="getTypeMyClaims('partial')">{{ t('instalpay')
+          <button :class="['filter-btn', typeSel=='partial' ? 'active' : '']" data-claim-filter="partial" @click="getTypeMyClaims('partial')">{{ t('instalpay')
           }}</button>
         </div>
       </div>
