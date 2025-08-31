@@ -80,7 +80,11 @@ const messages = {
     secondinstallment: 'Second Installment',
     claimapplyrejectd: 'Claim Application Rejected',
     paid: 'Paid',
-    pendingpayment: 'Pending Payment'
+    pendingpayment: 'Pending Payment',
+    accountbalance: 'Account Balance',
+    manageyourfundsandtran: 'Manage Your Funds and Transactions',
+    walletinformation: 'Wallet Information',
+    accountbalancecontent: 'Account Balance Page Content'
   },
   zh: {
     title: '基于区块链的代币化智能保险平台',
@@ -160,7 +164,11 @@ const messages = {
     secondinstallment: '第二期',
     claimapplyrejectd: '理赔申请已拒绝',
     paid: '已支付',
-    pendingpayment: '待支付'
+    pendingpayment: '待支付',
+    accountbalance: '账户余额',
+    manageyourfundsandtran: '管理您的资金和交易',
+    walletinformation: '钱包信息',
+    accountbalancecontent: '账户余额页面内容'
   }
 }
 
