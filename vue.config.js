@@ -1,4 +1,5 @@
 import { defineConfig } from '@vue/cli-service'
+import TerserPlugin from 'terser-webpack-plugin'
 
 export default defineConfig({
   transpileDependencies: true,
@@ -30,16 +31,14 @@ export default defineConfig({
       },
       // 代码压缩配置（Webpack 方式）
       minimizer: [
-        {
-          options: {
-            terserOptions: {
-              compress: {
-                drop_console: true,
-                drop_debugger: true
-              }
+        new TerserPlugin({
+          terserOptions: {
+            compress: {
+              drop_console: true,
+              drop_debugger: true
             }
           }
-        }
+        })
       ]
     },
     // 输出路径配置
