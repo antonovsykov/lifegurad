@@ -1,49 +1,108 @@
 import { createRouter, createWebHistory } from 'vue-router'
-// 导入组件
-import LifeHome from '../components/LifeHome.vue'
-import LifeDocx from '../components/LifeDocx.vue'
-import LifeClaims from '../components/LifeClaims.vue'
-import LifeBlog from '../components/LifeBlog.vue'
-import MyAccount from '../components/MyAccount.vue'
-import MyPolicy from '../components/MyPolicy.vue'
-import ClaimApply from '../components/ClaimApply.vue'
+
+import { useLayoutStore } from '../store/layout'
+
+// 门户页面
+import PortalLayout from '../layouts/PortalLayout.vue'
+import LifeHome from '../view/portal/LifeHome.vue'
+import LifeDocx from '../view/portal/LifeDocx.vue'
+import LifeBlog from '../view/portal/LifeBlog.vue'
+import LifeBlogDetail from '../view/portal/LifeBlogDetail.vue'
+import MyAccount from '../view/portal/MyAccount.vue'
+import MyPolicy from '../view/portal/MyPolicy.vue'
+import ClaimApply from '../view/portal/ClaimApply.vue'
+
+// 后台管理页面
+import AdminLayout from '../layouts/AdminLayout.vue'
+import AdminLogin from '../view/admin/AdminLogin.vue'
+import AdminHome from '../view/admin/AdminHome.vue'
+import AdminDashboard from '../view/admin/AdminDashboard.vue'
+import AdminPolicy from '../view/admin/AdminPolicy.vue'
+import AdminClaim from '../view/admin/AdminClaim.vue'
+import AdminBlog from '../view/admin/AdminBlog.vue'
 
 // 路由规则
 const routes = [
+  // 门户端路由（使用PortalLayout）
   {
     path: '/',
-    name: 'Home',
-    component: LifeHome
+    component: PortalLayout,
+    children: [
+      {
+        path: '',
+        name: 'Home',
+        component: LifeHome
+      },
+      {
+        path: 'details',
+        name: 'Details',
+        component: LifeDocx
+      },
+      {
+        path: 'blog',
+        name: 'Blog',
+        component: LifeBlog
+      },
+      {
+        path: 'blog/:id',
+        name: 'BlogEetail',
+        component: LifeBlogDetail
+      },
+      {
+        path: 'account',
+        name: 'MyAccount',
+        component: MyAccount
+      },
+      {
+        path: 'policy',
+        name: 'MyPolicy',
+        component: MyPolicy
+      },
+      {
+        path: 'apply',
+        name: 'ClaimApply',
+        component: ClaimApply
+      }
+    ]
   },
+  // 管理端路由（使用AdminLayout）
   {
-    path: '/details',
-    name: 'Details',
-    component: LifeDocx
-  },
-  {
-    path: '/claims',
-    name: 'Claims',
-    component: LifeClaims
-  },
-  {
-    path: '/blog',
-    name: 'Blog',
-    component: LifeBlog
-  },
-  {
-    path: '/account',
-    name: 'MyAccount',
-    component: MyAccount
-  },
-  {
-    path: '/policy',
-    name: 'MyPolicy',
-    component: MyPolicy
-  },
-  {
-    path: '/apply',
-    name: 'ClaimApply',
-    component: ClaimApply
+    path: '/admin',
+    component: AdminLayout,
+    children: [
+      {
+        path: '',
+        name: 'ALogin',
+        component: AdminLogin
+      },
+      {
+        path: '/admin/home',
+        name: 'AHome',
+        component: AdminHome,
+        children: [
+          {
+            path: '/admin/dashboard',
+            name: 'ADashboard',
+            component: AdminDashboard
+          },
+          {
+            path: '/admin/policy',
+            name: 'APolicy',
+            component: AdminPolicy
+          },
+          {
+            path: '/admin/claim',
+            name: 'AClaim',
+            component: AdminClaim
+          },
+          {
+            path: '/admin/blog',
+            name: 'ABlog',
+            component: AdminBlog
+          }
+        ]
+      },
+    ]
   }
 ]
 
@@ -53,20 +112,16 @@ const router = createRouter({
   routes
 })
 
-// 用于标记是否是初始加载（页面刷新）
-let isInitialLoad = true
-
 router.beforeEach((to, from, next) => {
   // 识别刷新的条件：初始加载 + from是初始状态（无name属性或为空对象）
-  const isRefresh = isInitialLoad && (from.name === undefined || Object.keys(from).length === 0)
-  
-  if (isRefresh && !to.meta.isHome) {
-    isInitialLoad = false
-    next('/') // 跳转到首页
+  const layoutStore = useLayoutStore()
+  // 管理端路由前缀为 /admin 时切换布局
+  if (to.path.startsWith('/admin')) {
+    layoutStore.setLayout('admin')
   } else {
-    isInitialLoad = false
-    next()
+    layoutStore.setLayout('portal')
   }
+  next()
 })
 
 export default router

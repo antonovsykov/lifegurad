@@ -114,7 +114,7 @@
 
 <script setup>
 import { onMounted, watch, ref } from 'vue'
-import { WEBUI_BASE_URL } from '../api/constants'
+import { WEBUI_BASE_URL } from '../../api/constants'
 import { ElMessage } from 'element-plus'
 import dayjs from 'dayjs';
 import { useAppKitAccount } from "@reown/appkit/vue";

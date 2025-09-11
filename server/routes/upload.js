@@ -29,6 +29,7 @@ router.post('/single', upload.single('file'), (req, res) => {
     return res.status(400).send('请选择要上传的文件');
   }
   res.send({
+    success: true,
     message: '文件上传成功',
     file: req.file
   });

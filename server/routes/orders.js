@@ -6,11 +6,11 @@ import Orders from '../models/orders.js';
 // 获取所有订单
 router.get('/', async (req, res) => {
   try {
-    const insurances = await Orders.getAll();
+    const orders = await Orders.getAll();
     res.json({
       success: true,
-      data: insurances,
-      count: insurances.length
+      data: orders,
+      count: orders.length
     });
   } catch (error) {
     res.status(500).json({

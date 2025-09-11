@@ -16,12 +16,16 @@ import insuranceRoutes from './routes/insurance.js';
 import ordersRoutes from './routes/orders.js';
 import claimsRoutes from './routes/claims.js';
 import uploadRoutes from './routes/upload.js';
+import userRoutes from './routes/users.js';
+import blogRoutes from './routes/blog.js';
 
 // 使用路由
 app.use('/api/insurance', insuranceRoutes);
 app.use('/api/orders', ordersRoutes);
 app.use('/api/claims', claimsRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/blog', blogRoutes);
 
 // 设置静态文件目录
 app.use('/uploads', express.static('uploads'));

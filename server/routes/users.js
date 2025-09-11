@@ -1,49 +1,27 @@
 import express from 'express';
+import bcrypt from 'bcryptjs';
 const router = express.Router();
 
-import Claims from '../models/claims.js';
-
-// 获取所有理赔信息
-router.get('/', async (req, res) => {
-  try {
-    const claims = await Claims.getAll();
-    res.json({
-      success: true,
-      data: claims,
-      count: claims.length
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-});
-
-// 根据ID获取理赔记录
-router.get('/id/:id', async (req, res) => {
-  try {
-    const claim = await Claims.getById(req.params.id);
-    res.json({
-      success: true,
-      data: claim
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message
-    });
-  }
-});
+import Users from '../models/users.js';
 
 // 根据Address获取理赔信息
-router.get('/address/:address/:type', async (req, res) => {
+router.post('/login', async (req, res) => {
   try {
-    const claims = await Claims.getByAddress(req.params.address, req.params.type);
-    res.json({
-      success: true,
-      data: claims
-    });
+    const { username, password } = req.body;
+    const user = await Users.getByAddress(username);
+    // 验证
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (isMatch) {
+      res.json({
+        success: true,
+        data: user
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: "用户名或密码错误"
+      });
+    }
   } catch (error) {
     res.status(500).json({
       success: false,

@@ -12,8 +12,8 @@
     <div class="contract">
       <div class="contract-info">
         <div data-en="LGUARD Contract:" data-zh="LGUARD合约:">LGUARD Contract:</div>
-        <div class="contract-addr">0x0BB579513DeAB87a247FB0CA8Eff32AeAcA2Bd40</div>
-        <button class="contract-copy" @click="copyText('0x0BB579513DeAB87a247FB0CA8Eff32AeAcA2Bd40')">
+        <div class="contract-addr">{{ formattedAddress }}</div>
+        <button class="contract-copy" @click="copyText(contractAddr)">
           <svg t="1756108006874" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
             p-id="6848" width="15" height="15">
             <path
@@ -28,7 +28,10 @@
           </svg>
         </button>
       </div>
-      <button class="contract-btn" data-en="Buy LGUARD" data-zh="购买LGUARD">Buy LGUARD</button>
+      <div class="contract-btn">
+        <button class="buy-l-btn" data-en="Buy LGUARD" data-zh="购买LGUARD" @click="buyLguard">Buy LGUARD</button>
+        <button class="view-l-btn" @click="viewPrice">{{ t('viewprice') }}</button>
+      </div>
     </div>
 
     <h2 class="section-title" id="products-title">{{ t('insurance_products') }}</h2>
@@ -101,9 +104,9 @@
 </template>
 
 <script setup>
-import { watch, onMounted, onBeforeMount, ref } from 'vue'
+import { watch, onMounted, computed, onBeforeMount, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { WEBUI_BASE_URL } from '../api/constants'
+import { WEBUI_BASE_URL } from '../../api/constants'
 import { ElMessage } from 'element-plus'
 
 import { useI18n } from 'vue-i18n'
@@ -112,6 +115,13 @@ const { t, locale } = useI18n();
 import { useAppKit, useAppKitAccount } from "@reown/appkit/vue";
 const { open } = useAppKit();
 const accountInfo = useAppKitAccount();
+
+const contractAddr = "0x0BB579513DeAB87a247FB0CA8Eff32AeAcA2Bd40";
+const formattedAddress = ref(null)
+// 格式化地址
+formattedAddress.value = computed(() => {
+  return `${contractAddr.slice(0, 6)}...${contractAddr.slice(-4)}`
+})
 
 const buymodel = ref({
   ins_id: "",
@@ -273,6 +283,14 @@ const copyText = (text) => {
     return false;
   }
 }
+
+const buyLguard = () => {
+  window.open('https://www.dbcswap.io', '_blank');
+}
+
+const viewPrice = () => {
+  window.open('https://app.xaiagent.io/zh/agent-detail/a3af87c0-70bc-44cd-98e6-cfb537fded70', '_blank');
+}
 </script>
 
 <style scoped>
@@ -281,6 +299,7 @@ const copyText = (text) => {
   margin: 24px auto;
   padding: 0 16px;
   margin-bottom: 80px;
+  min-height: calc(100vh - 300px);
 }
 
 .features {
@@ -354,12 +373,6 @@ h2.section-title {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 18px;
-}
-
-@media (max-width:800px) {
-  .products {
-    grid-template-columns: 1fr
-  }
 }
 
 .product-card {
@@ -530,10 +543,9 @@ h2.section-title {
 }
 
 .contract {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
 }
 
 .contract-info {
@@ -558,12 +570,44 @@ h2.section-title {
 }
 
 .contract-btn {
+  display: flex;
+  gap: 10px;
+  justify-self: end;
+}
+
+.buy-l-btn {
   background: var(--primary);
   color: #fff;
-  padding: 12px;
+  padding: 10px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  font-size: 14px;
   font-weight: 600
+}
+
+.view-l-btn {
+  background: #888;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600
+}
+
+@media (max-width:800px) {
+  .products {
+    grid-template-columns: 1fr
+  }
+
+  .contract {
+    grid-template-columns: 1fr
+  }
+
+  .contract-btn {
+    justify-self: start;
+  }
 }
 </style>

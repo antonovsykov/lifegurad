@@ -31,8 +31,8 @@ import { useAppKitAccount, useWalletInfo } from "@reown/appkit/vue";
 const accountInfo = useAppKitAccount();
 const walletInfo = useWalletInfo();
 
-import { getDbcBalance } from "../web3/dbc"
-import { getLaugrdBalance } from "../web3/lguard"
+import { getDbcBalance } from "../../web3/dbc"
+import { getLaugrdBalance } from "../../web3/lguard"
 
 // 定义切换语言的函数
 import { useI18n } from 'vue-i18n'
