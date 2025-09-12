@@ -51,11 +51,11 @@ app.use('/api', (req, res, next) => {
 app.use(history());
 
 // 静态托管 Vue 构建后的 dist 目录
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, '../dist')));
 
 // 处理所有 GET 请求，返回 index.html（交由 Vue Router 处理）
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, '../dist', 'index.html'));
 });
 
 // 启动服务器，监听指定的端口号
