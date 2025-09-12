@@ -30,11 +30,16 @@ app.use('/api/blog', blogRoutes);
 // 设置静态文件目录
 app.use('/uploads', express.static('uploads'));
 
+// 先定义 /api 相关的路由
+app.use('/api', (req, res, next) => {
+  next();
+});
+
 // 设置静态文件目录
 app.use(express.static('../dist'));
 
 // 处理所有的GET请求，将其都重定向到index.html
-app.get('/', (req, res) => {
+app.get('*', (req, res) => {
   res.sendFile(__dirname + '/dist/index.html');
 });
 
