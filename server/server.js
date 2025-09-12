@@ -1,5 +1,17 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import history from 'connect-history-api-fallback';
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+
+// 获取当前文件的绝对路径（相当于 CommonJS 的 __filename）
+const __filename = fileURLToPath(import.meta.url);
+
+// 获取当前目录的绝对路径（相当于 CommonJS 的 __dirname）
+const __dirname = dirname(__filename);
+
+
 const app = express();
 
 // 解析命令行参数来获取端口号
@@ -35,12 +47,15 @@ app.use('/api', (req, res, next) => {
   next();
 });
 
-// 设置静态文件目录
-app.use(express.static('../dist'));
+// 使用 history 中间件，用于支持 Vue Router 的 history 模式
+app.use(history());
 
-// 处理所有的GET请求，将其都重定向到index.html
-app.get('*', (req, res) => {
-  res.sendFile(__dirname + '/dist/index.html');
+// 静态托管 Vue 构建后的 dist 目录
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// 处理所有 GET 请求，返回 index.html（交由 Vue Router 处理）
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // 启动服务器，监听指定的端口号
