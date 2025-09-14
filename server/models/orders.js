@@ -22,6 +22,12 @@ class Orders {
     return result.rows[0];
   }
 
+   // 根据ID获取订单
+  static async getByHash(hash) {
+    const result = await db.query('SELECT * FROM orders WHERE hash = $1', [hash]);
+    return result.rows[0];
+  }
+
   // 根据address获取订单包含保险内容
   static async getByAddress(address, type) {
     if (type == 'valid') {
@@ -40,14 +46,14 @@ class Orders {
   }
 
   // 创建订单
-  static async create({ ins_id, wallet_adr, duration, share, money, total, hash, email }) {
+  static async create({ ins_id, wallet_adr, duration, share, money, total, hash, email, paystatus }) {
     try {
       const orderId = uuidv4();
       const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
       const endTime = moment().add(duration, 'months').format('YYYY-MM-DD HH:mm:ss');
       const result = await db.query(
-        'INSERT INTO orders (id, ins_id, wallet_adr, duration, share, money, total, hash, email, status,start_time, end_time, create_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *',
-        [orderId, ins_id, wallet_adr, duration, share, money, total, hash, email, 0, currentTime, endTime, currentTime]
+        'INSERT INTO orders (id, ins_id, wallet_adr, duration, share, money, total, hash, email, status,start_time, end_time, create_at, paystatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *',
+        [orderId, ins_id, wallet_adr, duration, share, money, total, hash, email, 0, currentTime, endTime, currentTime, paystatus]
       );
       return result.rows[0];
     } catch (error) {

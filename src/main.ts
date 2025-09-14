@@ -5,8 +5,8 @@ import router from './router'
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 
-import { WagmiPlugin } from '@wagmi/vue'
-import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query'
+import { WagmiPlugin } from '@wagmi/vue';
+import { QueryClient, VueQueryPlugin } from '@tanstack/vue-query';
 import { wagmiAdapter } from './web3/index'
 
 import store from './store'

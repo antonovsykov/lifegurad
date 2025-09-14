@@ -1,35 +1,46 @@
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
 import { type AppKitNetwork } from '@reown/appkit/networks'
+import { createConfig, http } from '@wagmi/core'
 
 export const projectId = "669b5cd517fea9a8736980e7dd8f5900"
 if (!projectId) {
   throw new Error('VITE_PROJECT_ID is not set')
 }
 
-export const dbcNetwork: AppKitNetwork = {
-  id: 19880818, // 你的自定义链的 Chain ID
+const dbcChain = {
+  id: 19880818, // DBC链的chainId
   name: 'LifeGurad',
-  rpcUrls: { // 注意这里是 rpcUrls (复数) 并且是一个对象
-    default: {
-      http: ['https://rpc1.dbcwallet.io'] // RPC URL 应该放在数组中
-    }
-  },
   nativeCurrency: {
     name: 'DBC',
     symbol: 'DBC',
     decimals: 18
   },
-  blockExplorers: { // 注意这里是 blockExplorers (复数) 并且是一个对象
+  rpcUrls: {
+    default: {
+      http: ['https://rpc1.dbcwallet.io'],
+    },
+  },
+  blockExplorers: {
     default: {
       name: 'DBCScan',
-      url: 'https://www.dbcscan.io'
-    }
-  }
+      url: 'https://www.dbcscan.io', // DBC区块浏览器地址
+    },
+  },
 }
+
+// 定义连接RPC网络
+export const dbcNetwork: AppKitNetwork = dbcChain
 
 export const networks: [AppKitNetwork, ...AppKitNetwork[]] = [dbcNetwork]
 
 export const wagmiAdapter = new WagmiAdapter({
   networks,
   projectId
+})
+
+export const config = createConfig({
+  chains: [dbcChain],
+  transports: {
+    [dbcChain.id]: http("https://rpc1.dbcwallet.io"),
+  },
 })

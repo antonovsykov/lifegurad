@@ -120,6 +120,8 @@ import dayjs from 'dayjs';
 import { useAppKitAccount } from "@reown/appkit/vue";
 const accountInfo = useAppKitAccount();
 
+import router from '@/router';
+
 // 定义切换语言的函数
 import { useI18n } from 'vue-i18n'
 const { t, locale } = useI18n();
@@ -136,6 +138,20 @@ watch(
     checkDomLang()
   },
   { immediate: false } // 可选：是否在初始化时立即执行一次
+)
+
+// 监听 accountInfo 变化
+watch(
+  accountInfo.value, 
+  async (newInfo, oldInfo) => {
+    console.log(`用户从 ${oldInfo} 切换到了 ${newInfo}`)
+    if (newInfo?.address) {
+      await getMyOrders()
+    } else {
+      router.push("/")
+    }
+  },
+  { immediate: false }
 )
 
 // 屏幕尺寸

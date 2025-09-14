@@ -2,6 +2,8 @@ import express from 'express';
 const router = express.Router();
 
 import Orders from '../models/orders.js';
+import { verifyWeb3Payment, checkAddress } from '../web3/web3util.js'
+import { sendEmail } from '../utils/emailutil.js'
 
 // 获取所有订单
 router.get('/', async (req, res) => {
@@ -56,11 +58,27 @@ router.get('/address/:address/:type', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { ins_id, wallet_adr, duration, share, money, total, hash, email } = req.body;
-    await Orders.create({ ins_id, wallet_adr, duration, share, money, total, hash, email });
-    res.json({
-      success: true,
-      message: "Create Success"
-    });
+
+    // 校验hash值
+    const result = await verifyWeb3Payment(hash, wallet_adr, checkAddress, total);
+    const paystatus = result ? 1 : 0;
+    await Orders.create({ ins_id, wallet_adr, duration, share, money, total, hash, email, paystatus });
+
+    if (result) {
+      sendEmail(email, "购买成功", "");
+    }
+    
+    if (result) {
+      res.json({
+        success: true,
+        message: "Create Success"
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        message: "Create Failed"
+      });
+    }
   } catch (error) {
     console.log("===================error==================", error)
     res.status(500).json({

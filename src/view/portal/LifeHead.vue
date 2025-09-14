@@ -28,7 +28,7 @@
             <span v-if="!isMobile">{{ t('connect_wallet') }}</span>
           </button>
           <button class="wallet-info wallet-target" v-else @click="showWalletInfo">
-            <img :src="walletInfo.walletInfo.icon" alt="Lifeguard Logo" />
+            <img :src="walletInfo.walletInfo?.icon" alt="Lifeguard Logo" />
             <span v-if="!isMobile">{{ formattedAddress }}</span>
           </button>
           <!-- 提示框（条件渲染） -->

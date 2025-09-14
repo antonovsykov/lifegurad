@@ -13,7 +13,7 @@
       <div class="contract-info">
         <div data-en="LGUARD Contract:" data-zh="LGUARD合约:">LGUARD Contract:</div>
         <div class="contract-addr">{{ formattedAddress }}</div>
-        <button class="contract-copy" @click="copyText(contractAddr)">
+        <button class="contract-copy" @click="copyText(LGUARD_TOKEN_CONTRACT_ADDRESS)">
           <svg t="1756108006874" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
             p-id="6848" width="15" height="15">
             <path
@@ -109,6 +109,8 @@ import { useRouter } from 'vue-router'
 import { WEBUI_BASE_URL } from '../../api/constants'
 import { ElMessage } from 'element-plus'
 
+import { LGUARD_TOKEN_CONTRACT_ADDRESS, handleTransfer, RECIPIENT, checkTransfer } from "../../web3/lguard"
+
 import { useI18n } from 'vue-i18n'
 const { t, locale } = useI18n();
 
@@ -116,11 +118,10 @@ import { useAppKit, useAppKitAccount } from "@reown/appkit/vue";
 const { open } = useAppKit();
 const accountInfo = useAppKitAccount();
 
-const contractAddr = "0x0BB579513DeAB87a247FB0CA8Eff32AeAcA2Bd40";
 const formattedAddress = ref(null)
 // 格式化地址
 formattedAddress.value = computed(() => {
-  return `${contractAddr.slice(0, 6)}...${contractAddr.slice(-4)}`
+  return `${LGUARD_TOKEN_CONTRACT_ADDRESS.slice(0, 6)}...${LGUARD_TOKEN_CONTRACT_ADDRESS.slice(-4)}`
 })
 
 const buymodel = ref({
@@ -247,7 +248,14 @@ const getInsurance = async () => {
 }
 
 const creatOrder = async () => {
+  const hash = await handleTransfer(RECIPIENT, buymodel.value.total);
+  const payStatus = await checkTransfer(hash);
+  if (!payStatus) {
+    ElMessage.success(t('payfailed'));
+    return;
+  }
   buymodel.value.wallet_adr = accountInfo.value.address
+  buymodel.value.hash = hash
   await fetch(`${WEBUI_BASE_URL}/api/orders`, {
     method: 'POST',
     headers: {
@@ -258,13 +266,15 @@ const creatOrder = async () => {
     if (res.ok) {
       const data = await res.json();
       if (data.success) {
-        ElMessage.success(t('paysuccess'))
+        ElMessage.success(t('successinsured'))
         closeModal()
+      } else {
+        ElMessage.success(t('failedinsured'))
       }
     }
   }).catch((err) => {
     console.log("=======payerr=====", err)
-    ElMessage.success(t('payfailed'))
+    ElMessage.success(t('failedinsured'))
   });
 }
 

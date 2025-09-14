@@ -6,16 +6,18 @@
       <div class="card-header">
         <div class="card-title">{{ t('walletinformation') }}</div>
         <div class="balance-address">
-          <img :src="walletInfo.walletInfo.icon" alt="Lifeguard Logo" />
+          <img :src="walletInfo.walletInfo?.icon" alt="Lifeguard Logo" />
           <span>{{ accountInfo.address }}</span>
         </div>
         <div class="balance-info">
           <label>DBC</label>
-          <span>{{ formatNumber(dbcBalance) }}</span>
+          <span v-if="balance.data">{{ formateDbcBalance(balance.data) }}</span>
+          <span v-else>...</span>
         </div>
         <div class="balance-info">
           <label>LGUARD</label>
-          <span>{{ formatNumber(lguardBalance) }}</span>
+          <span v-if="lguardBalance">{{ formatNumber(lguardBalance) }}</span>
+          <span v-else>...</span>
         </div>
       </div>
       <div class="tran-info">
@@ -26,25 +28,51 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
-import { useAppKitAccount, useWalletInfo } from "@reown/appkit/vue";
-const accountInfo = useAppKitAccount();
-const walletInfo = useWalletInfo();
-
-import { getDbcBalance } from "../../web3/dbc"
+import { onMounted, watch, ref } from 'vue'
+import { useAppKitAccount, useWalletInfo } from "@reown/appkit/vue"
+import { useAccount } from '@wagmi/vue'
+import { useBalance } from '@wagmi/vue'
 import { getLaugrdBalance } from "../../web3/lguard"
+
+const accountInfo = useAppKitAccount()
+const walletInfo = useWalletInfo()
+const { address } = useAccount()
+
+import router from '@/router';
+
+// 获取原生币余额 - 正确的响应式写法
+const balance = useBalance({
+  address: address
+})
+
+const formateDbcBalance = (data) => {
+  const balance = data.value?.formatted || '0'
+  return formatNumber(balance)
+}
 
 // 定义切换语言的函数
 import { useI18n } from 'vue-i18n'
 const { t } = useI18n();
 
-const dbcBalance = ref()
 const lguardBalance = ref()
 onMounted(async () => {
   let address = accountInfo.value.address
-  dbcBalance.value = await getDbcBalance(address)
   lguardBalance.value = await getLaugrdBalance(address)
 })
+
+// 监听 accountInfo 变化
+watch(
+  accountInfo?.value, 
+  async (newInfo, oldInfo) => {
+    console.log(`用户从 ${oldInfo} 切换到了 ${newInfo}`)
+    if (newInfo?.address) {
+      lguardBalance.value = await getLaugrdBalance(newInfo?.address)
+    } else {
+      router.push("/")
+    }
+  },
+  { immediate: false }
+)
 
 const formatNumber = (num) => {
   // 四舍五入保留两位小数
@@ -56,7 +84,6 @@ const formatNumber = (num) => {
   // 处理有小数的情况，确保保留两位有效小数
   return rounded.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
 }
-
 </script>
 
 <style scoped>
