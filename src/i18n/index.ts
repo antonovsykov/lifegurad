@@ -118,7 +118,17 @@ const messages = {
     operations: 'Operations',
     view: 'View',
     edit: 'Edit',
-    delete: 'Delete'
+    delete: 'Delete',
+    '1m': '1 Month',
+    '3m': '3 Month',
+    '6m': '6 Month',
+    '12m': '12 Month',
+    'ror3': '3% yield',
+    'ror5': '5% yield',
+    'ror10': '10% yield',
+    'ror15': '15% yield',
+    'ror20': '20% yield',
+    'ror50': '50% yield'
   },
   zh: {
     title: '基于区块链的代币化智能保险平台',
@@ -236,7 +246,17 @@ const messages = {
     operations: '操作',
     view: '查看',
     edit: '编辑',
-    delete: '删除'
+    delete: '删除',
+    '1m': '1个月',
+    '3m': '3个月',
+    '6m': '6个月',
+    '12m': '12个月',
+    'ror3': '收益率3%',
+    'ror5': '收益率5%',
+    'ror10': '收益率10%',
+    'ror15': '收益率15%',
+    'ror20': '收益率20%',
+    'ror50': '收益率50%'
   }
 }
 

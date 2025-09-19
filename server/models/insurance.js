@@ -5,7 +5,7 @@ class Insurance {
   static async getAll() {
     try {
       const result = await db.query(
-        'SELECT * FROM insurance order by creat_at asc'
+        'SELECT i.*, e.months,e.times FROM insurance i left join earnings e on i.id = e.ins_id order by i.creat_at asc'
       );
       return result.rows;
     } catch (error) {
@@ -15,7 +15,7 @@ class Insurance {
 
   // 根据ID获取险种
   static async getById(id) {
-    const result = await db.query('SELECT * FROM insurance WHERE id = $1', [id]);
+    const result = await db.query('SELECT i.*, e.months,e.times FROM insurance i left join earnings e on i.id = e.ins_id WHERE i.id = $1', [id]);
     return result.rows[0];
   }
 }

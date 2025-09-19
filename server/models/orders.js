@@ -2,6 +2,8 @@ import db from '../config/database.js'
 import { v4 as uuidv4 } from 'uuid'
 import moment from 'moment'
 
+import Earnings from './earnings.js';
+
 class Orders {
 
   // 获取所有订单
@@ -46,14 +48,29 @@ class Orders {
   }
 
   // 创建订单
-  static async create({ ins_id, wallet_adr, duration, share, money, total, hash, email, paystatus }) {
+  static async create({ ins_id, wallet_adr, duration, share, money, total, hash, email, paystatus}) {
     try {
       const orderId = uuidv4();
       const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
       const endTime = moment().add(duration, 'months').format('YYYY-MM-DD HH:mm:ss');
+
+      const earning = await Earnings.getById(ins_id);
+      const months = JSON.parse(earning.months);
+      const targetData = months.find(item => {return item && item.num === duration; });
+      let nums = 1;
+      let paymoney = 0;
+      let paytotal = 0;
+      if (earning.times == 1) {
+        paytotal = total * targetData.rate / 100 + total;
+        paymoney = paytotal;
+      } else {
+        nums = earning.times * duration * share;
+        paytotal = total * targetData.rate / 100 + total;
+        paymoney = paytotal / nums;
+      }
       const result = await db.query(
-        'INSERT INTO orders (id, ins_id, wallet_adr, duration, share, money, total, hash, email, status,start_time, end_time, create_at, paystatus) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *',
-        [orderId, ins_id, wallet_adr, duration, share, money, total, hash, email, 0, currentTime, endTime, currentTime, paystatus]
+        'INSERT INTO orders (id, ins_id, wallet_adr, duration, share, money, total, hash, email, status,start_time, end_time, create_at, paystatus, nums, paymoney, paytotal) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17) RETURNING *',
+        [orderId, ins_id, wallet_adr, duration, share, money, total, hash, email, 0, currentTime, endTime, currentTime, paystatus, nums, paymoney, paytotal]
       );
       return result.rows[0];
     } catch (error) {

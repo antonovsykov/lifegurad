@@ -55,8 +55,8 @@ router.get('/address/:address/:type', async (req, res) => {
 // 创建理赔记录
 router.post('/', async (req, res) => {
   try {
-    const { order_id, reasion, files } = req.body;
-    await Claims.create({ order_id, reasion, files });
+    const { order_id, reasion, files, paymoney } = req.body;
+    await Claims.create({ order_id, reasion, files, paymoney });
     res.json({
       success: true,
       message: "Create Success"

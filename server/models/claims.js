@@ -43,15 +43,15 @@ class Claims {
   }
 
   // 创建理赔
-  static async create({ order_id, reasion, files }) {
+  static async create({ order_id, reasion, files, paymoney }) {
     try {
       const orderId = uuidv4();
       const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
       const order = await Orders.getById(order_id);
       if (order.status == 0) {
         const insurance = await Insurance.getById(order.ins_id);
-        const first_money = order.total * insurance.first / 100;
-        const second_money = order.total * insurance.second / 100;
+        const first_money = paymoney / 2;
+        const second_money = paymoney / 2;
         const result = await db.query(
           'INSERT INTO claims (id, ins_id, order_id, reasion, files, submit_time, status, first_money, second_money) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
           [orderId, insurance.id, order_id, reasion, files, currentTime, 1, first_money, second_money]

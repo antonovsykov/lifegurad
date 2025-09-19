@@ -77,17 +77,16 @@
           <div class="form-group">
             <label>{{ t('policevalidityperiod') }}</label>
             <select id="policyDuration" required>
-              <option value="">{{ t('select') }}</option>
-              <option value="1">1 {{ t('month') }}</option>
-              <option value="3">3 {{ t('month') }}</option>
-              <option value="6">6 {{ t('month') }}</option>
-              <option value="12">12 {{ t('month') }}</option>
+              <option v-if="selMonth == 1" value="1">1 {{ t('month') }}</option>
+              <option v-if="selMonth == 3" value="3">3 {{ t('month') }}</option>
+              <option v-if="selMonth == 6" value="6">6 {{ t('month') }}</option>
+              <option v-if="selMonth == 12" value="12">12 {{ t('month') }}</option>
             </select>
           </div>
 
           <div class="form-group">
             <label>{{ t('claimamount') }}（LGUARD）</label>
-            <input type="number" id="claimAmount" :placeholder="t('enterclaimamount')" required>
+            <input type="number" id="claimAmount" :value="claimModel.paymoney" required>
           </div>
 
           <div class="form-group">
@@ -211,16 +210,20 @@ function checkDomLang() {
 
 // 打开理赔模态
 const selPolicy = ref()
+const selMonth = ref(1)
 const insTitle = ref('')
 const selectedFiles = ref([])
 const claimModel = ref({
   order_id: "",
   reasion: "",
-  files: []
+  files: [],
+  paymoney: 0
 })
 const openClaimModal = (policy) => {
   selectedFiles.value = []
   selPolicy.value = policy
+  selMonth.value = policy.duration
+  claimModel.value.paymoney = policy.paymoney
   let currentLang = locale.value
   insTitle.value = currentLang === 'en' ? policy.title_en : policy.title_zh
   document.getElementById('claimModal').style.display = 'flex'

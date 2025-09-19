@@ -28,8 +28,8 @@ const dbcPublicClient = createPublicClient({
   )
 });
 
-// export const checkAddress = "0x8b0b8c7f984dd3f2b580149ade3cdab504d3af1f";
 export const checkAddress = "0xde8784011e1C864E37697faE28a6E19ae4E6DD9d";
+// export const checkAddress = "0x8b0b8c7f984dd3f2b580149ade3cdab504d3af1f";
 
 export async function verifyWeb3Payment(txHash, fromAddress, toAddress, payAmount) {
   try {

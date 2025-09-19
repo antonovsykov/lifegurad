@@ -72,10 +72,9 @@
       <h2 id="modal-title"></h2>
       <label data-en="Duration (months):" data-zh="持续时间(月)：" for="duration">Duration (months):</label>
       <select id="duration" v-model="buymodel.duration" @change="calculateTotal">
-        <option data-en="1 Month" data-zh="1 月" value="1">1 Month</option>
-        <option data-en="3 Month" data-zh="3 月" value="3">3 Months</option>
-        <option data-en="6 Month" data-zh="6 月" value="6">6 Months</option>
-        <option data-en="12 Month" data-zh="12 月" value="12">12 Months</option>
+        <template v-for="item in selectMonths" :key="item.num">
+          <option :value="item.num">{{ t(item.month) }} ({{ t(item.ror) }})</option>
+        </template>
       </select>
 
       <label data-en="Shares:" data-zh="份额：" for="shares">Shares:</label>
@@ -98,7 +97,8 @@
       </p>
       <p id="view-details-id" class="view-details" data-en="View Details" data-zh="查看详情" @click="viewDetails">View
         Details</p>
-      <button data-en="Confirm and Pay" data-zh="确认支付" @click="creatOrder">Confirm and Pay</button>
+      <button v-if="createStatus" :disabled="createStatus" data-en="Confirm and Pay..." data-zh="确认支付..." @click="creatOrder">Confirm and Pay...</button>
+      <button v-else data-en="Confirm and Pay" data-zh="确认支付" @click="creatOrder">Confirm and Pay</button>
     </div>
   </div>
 </template>
@@ -154,11 +154,15 @@ const searchProducts = (event) => {
 }
 
 let selectedProduct = null;
+let selectMonths = ref([]);
 function openModal(index) {
+  createStatus.value = false;
   if (accountInfo.value.address) {
     selectedProduct = PRODUCTS.value[index];
+    selectMonths.value = JSON.parse(selectedProduct.months);
     buymodel.value.duration = 1
     buymodel.value.share = 1
+    buymodel.value.nums = selectedProduct.times
     let modalTitle = document.getElementById('modal-title');
     modalTitle.setAttribute('data-en', selectedProduct.title_en);
     modalTitle.setAttribute('data-zh', selectedProduct.title_zh);
@@ -170,11 +174,11 @@ function openModal(index) {
   } else {
     open()
   }
-
 }
 
 const closeModal = () => {
   document.getElementById('purchase-modal').style.display = 'none';
+  createStatus.value = false;
 }
 
 const calculateTotal = () => {
@@ -247,11 +251,14 @@ const getInsurance = async () => {
   });
 }
 
+const createStatus = ref(false)
 const creatOrder = async () => {
+  createStatus.value = true;
   const hash = await handleTransfer(RECIPIENT, buymodel.value.total);
   const payStatus = await checkTransfer(hash);
   if (!payStatus) {
-    ElMessage.success(t('payfailed'));
+    createStatus.value = false;
+    ElMessage.error(t('payfailed'));
     return;
   }
   buymodel.value.wallet_adr = accountInfo.value.address
@@ -263,6 +270,7 @@ const creatOrder = async () => {
     },
     body: JSON.stringify(buymodel.value)
   }).then(async (res) => {
+    createStatus.value = false;
     if (res.ok) {
       const data = await res.json();
       if (data.success) {
@@ -273,6 +281,7 @@ const creatOrder = async () => {
       }
     }
   }).catch((err) => {
+    createStatus.value = false;
     console.log("=======payerr=====", err)
     ElMessage.success(t('failedinsured'))
   });
