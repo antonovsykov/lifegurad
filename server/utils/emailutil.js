@@ -10,13 +10,14 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-export const sendEmail = async (toemail, text, html) => {
+export const sendEmail = async (toemail, html) => {
+
   // 邮件内容
   const mailOptions = {
     from: '"LifeGurad" <2815206703@qq.com>', // 发件人信息
     to: toemail, // 收件人邮箱，多个邮箱用逗号分隔
     subject: "LifeGurad Reminder", // 邮件主题
-    text: text, // 纯文本内容
+    text: "", // 纯文本内容
     html: html // HTML内容，如果提供则优先显示
   };
   try {

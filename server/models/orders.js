@@ -34,15 +34,15 @@ class Orders {
   static async getByAddress(address, type) {
     if (type == 'valid') {
       const checkTime = moment().format('YYYY-MM-DD');
-      const result = await db.query('SELECT o.*, i.title_en, i.title_zh, i.brief_en, i.brief_zh, i.bgimg FROM orders o left join insurance i on o.ins_id = i.id WHERE o.wallet_adr = $1 and o.end_time >= $2 order by o.create_at desc', [address, checkTime]);
+      const result = await db.query('SELECT o.*, i.title_en, i.title_zh, i.brief_en, i.brief_zh, i.bgimg, (select count(*) from claims where order_id = o.id and status > 0) as count FROM orders o left join insurance i on o.ins_id = i.id WHERE o.wallet_adr = $1 and o.end_time >= $2 order by o.create_at desc', [address, checkTime]);
       return result.rows;
     } else if (type == 'expiring') {
       const startTime = moment().format('YYYY-MM-DD');
       const endTime = moment().add(3, 'days').format('YYYY-MM-DD');
-      const result = await db.query('SELECT o.*, i.title_en, i.title_zh, i.brief_en, i.brief_zh, i.bgimg FROM orders o left join insurance i on o.ins_id = i.id WHERE o.wallet_adr = $1 and o.end_time >= $2 and o.end_time <= $3 order by o.create_at desc', [address, startTime, endTime]);
+      const result = await db.query('SELECT o.*, i.title_en, i.title_zh, i.brief_en, i.brief_zh, i.bgimg, (select count(*) from claims where order_id = o.id and status > 0) as count FROM orders o left join insurance i on o.ins_id = i.id WHERE o.wallet_adr = $1 and o.end_time >= $2 and o.end_time <= $3 order by o.create_at desc', [address, startTime, endTime]);
       return result.rows;
     } else {
-      const result = await db.query('SELECT o.*, i.title_en, i.title_zh, i.brief_en, i.brief_zh, i.bgimg FROM orders o left join insurance i on o.ins_id = i.id WHERE o.wallet_adr = $1 order by o.create_at desc', [address]);
+      const result = await db.query('SELECT o.*, i.title_en, i.title_zh, i.brief_en, i.brief_zh, i.bgimg, (select count(*) from claims where order_id = o.id and status > 0) as count FROM orders o left join insurance i on o.ins_id = i.id WHERE o.wallet_adr = $1 order by o.create_at desc', [address]);
       return result.rows;
     }
   }

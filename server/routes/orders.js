@@ -4,6 +4,10 @@ const router = express.Router();
 import Orders from '../models/orders.js';
 import { verifyWeb3Payment, checkAddress } from '../web3/web3util.js'
 import { sendEmail } from '../utils/emailutil.js'
+import { insEmailTmp } from '../utils/emailtemp.js'
+import Insurance from '../models/insurance.js';
+import dayjs from 'dayjs';
+import moment from 'moment'
 
 // 获取所有订单
 router.get('/', async (req, res) => {
@@ -57,15 +61,21 @@ router.get('/address/:address/:type', async (req, res) => {
 // 创建订单订单
 router.post('/', async (req, res) => {
   try {
-    const { ins_id, wallet_adr, duration, share, money, total, hash, email } = req.body;
+    const { ins_id, wallet_adr, duration, share, money, total, hash, email, lang } = req.body;
 
     // 校验hash值
     const result = await verifyWeb3Payment(hash, wallet_adr, checkAddress, total);
     const paystatus = result ? 1 : 0;
-    await Orders.create({ ins_id, wallet_adr, duration, share, money, total, hash, email, paystatus });
+    const order = await Orders.create({ ins_id, wallet_adr, duration, share, money, total, hash, email, paystatus });
 
     if (result) {
-      sendEmail(email, "购买成功", "");
+      const insurance = await Insurance.getById(ins_id);
+      const title = lang == 'zh' ? insurance.title_zh : insurance.title_en;
+      const startTime = dayjs(order.start_time).format('YYYY-MM-DD');
+      const endTime = dayjs(order.end_time).format('YYYY-MM-DD');
+      const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
+      const html = insEmailTmp(wallet_adr, total, title, startTime, endTime, currentTime, lang);
+      sendEmail(email, html);
     }
     
     if (result) {

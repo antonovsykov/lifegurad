@@ -4,7 +4,19 @@
     <p class="subtitle">{{ t('manageyourfundsandtran') }}</p>
     <div class="card">
       <div class="card-header">
-        <div class="card-title">{{ t('walletinformation') }}</div>
+        <div class="card-title">
+          <span>{{ t('walletinformation') }}</span>
+          <button class="card-btn" @click="handleLaugrdBalance">
+            <svg t="1758487151320" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg"
+              p-id="6124" width="12" height="12" fill="currentColor">
+              <path
+                d="M1019.782334 447.363326V447.939248h-132.462035v-0.51193H572.674973l208.099777-206.30802a383.947927 383.947927 0 1 0 90.09978 398.793914h136.813445a511.930569 511.930569 0 1 1-134.381775-490.493477L1023.813788 0v447.363326h-4.031454z"
+                p-id="6125"></path>
+              <animateTransform hidden attributeName="transform" ref="refreshAnimate" type="rotate" from="0 0 0"
+                to="360 0 0" dur="0.5s" repeatCount="indefinite" begin="indefinite" />
+            </svg>
+          </button>
+        </div>
         <div class="balance-address">
           <img :src="walletInfo.walletInfo?.icon" alt="Lifeguard Logo" />
           <span>{{ accountInfo.address }}</span>
@@ -62,7 +74,7 @@ onMounted(async () => {
 
 // 监听 accountInfo 变化
 watch(
-  accountInfo?.value, 
+  accountInfo?.value,
   async (newInfo, oldInfo) => {
     console.log(`用户从 ${oldInfo} 切换到了 ${newInfo}`)
     if (newInfo?.address) {
@@ -73,6 +85,17 @@ watch(
   },
   { immediate: false }
 )
+
+const refreshAnimate = ref(null);
+const handleLaugrdBalance = async () => {
+  refreshAnimate.value?.beginElement();
+  let address = accountInfo.value.address
+  lguardBalance.value = await getLaugrdBalance(address)
+  // 3. 动画启动后，再等待1秒停止
+  setTimeout(() => {
+    refreshAnimate.value?.endElement();
+  }, 500);
+}
 
 const formatNumber = (num) => {
   // 四舍五入保留两位小数
@@ -103,9 +126,24 @@ const formatNumber = (num) => {
 }
 
 .card-title {
+  display: flex;
+  align-items: center;
   font-size: 18px;
   font-weight: 600;
   color: var(--dark);
+}
+
+.card-title span {
+  margin-right: 10px;
+}
+
+.card-btn {
+  background: none;
+  outline: none;
+  border: none;
+  padding: 0px;
+  margin-top: 4px;
+  cursor: pointer;
 }
 
 .card-header {

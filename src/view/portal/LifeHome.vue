@@ -133,7 +133,8 @@ const buymodel = ref({
   total: 0,
   hash: "",
   email: "",
-  status: 0
+  status: 0,
+  lang: "en"
 })
 
 const PRODUCTS = ref([]);
@@ -263,6 +264,7 @@ const creatOrder = async () => {
   }
   buymodel.value.wallet_adr = accountInfo.value.address
   buymodel.value.hash = hash
+  buymodel.value.lang = locale.value;
   await fetch(`${WEBUI_BASE_URL}/api/orders`, {
     method: 'POST',
     headers: {

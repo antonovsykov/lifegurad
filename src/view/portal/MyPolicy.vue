@@ -41,17 +41,23 @@
               </div>
             </div>
             <div class="policy-status">
-              <template v-if="item.status == 1">
-                <span v-if="!isMobile" class="status-badge status-pending">{{ t('underreview') }}</span>
-                <button class="action-btn btn-disabled" disabled>{{ t('inprogress') }}</button>
-              </template>
-              <template v-else-if="item.status == 2">
-                <span v-if="!isMobile" class="status-badge status-paid">{{ t('effective') }}</span>
-                <button class="action-btn btn-disabled" disabled>{{ t('processed') }}</button>
-              </template>
-              <template v-else>
+              <template v-if="item.nums > 1 && item.count < item.nums">
                 <span v-if="!isMobile" class="status-badge status-available">{{ t('notapplied') }}</span>
-                <button class="action-btn btn-primary" @click="openClaimModal(item)">{{ t('fileclaim') }}</button>
+                  <button class="action-btn btn-primary" @click="openClaimModal(item)">{{ t('fileclaim') }} {{ item.count }}/{{ item.nums }}</button>
+                </template>
+              <template v-else>
+                <template v-if="item.status == 1">
+                  <span v-if="!isMobile" class="status-badge status-pending">{{ t('underreview') }}</span>
+                  <button class="action-btn btn-disabled" disabled>{{ t('inprogress') }}</button>
+                </template>
+                <template v-else-if="item.status == 2">
+                  <span v-if="!isMobile" class="status-badge status-paid">{{ t('effective') }}</span>
+                  <button class="action-btn btn-disabled" disabled>{{ t('processed') }}</button>
+                </template>
+                <template v-else>
+                  <span v-if="!isMobile" class="status-badge status-available">{{ t('notapplied') }}</span>
+                  <button class="action-btn btn-primary" @click="openClaimModal(item)">{{ t('fileclaim') }}</button>
+                </template>
               </template>
             </div>
           </div>
@@ -141,7 +147,7 @@ watch(
 
 // 监听 accountInfo 变化
 watch(
-  accountInfo.value, 
+  accountInfo.value,
   async (newInfo, oldInfo) => {
     console.log(`用户从 ${oldInfo} 切换到了 ${newInfo}`)
     if (newInfo?.address) {

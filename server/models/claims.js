@@ -45,9 +45,14 @@ class Claims {
   // 创建理赔
   static async create({ order_id, reasion, files, paymoney }) {
     try {
-      const orderId = uuidv4();
-      const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
+      // 校验保单
       const order = await Orders.getById(order_id);
+      const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
+      if (order.end_time < currentTime) {
+        throw new Error('yourclaimappliensuccess');
+      }
+
+      const orderId = uuidv4();
       if (order.status == 0) {
         const insurance = await Insurance.getById(order.ins_id);
         const first_money = paymoney / 2;
