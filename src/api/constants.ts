@@ -1,1 +1,1 @@
-export const WEBUI_BASE_URL = 'https://www.lifegurad.chat';
+export const WEBUI_BASE_URL = window.location.origin;
