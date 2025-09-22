@@ -27,4 +27,6 @@ const queryClient = new QueryClient()
 app.use(WagmiPlugin, { config: wagmiAdapter.wagmiConfig })
 app.use(VueQueryPlugin, { queryClient })
 
+console.log("====================", process.env.VUE_APP_API_URL)
+
 app.mount('#app')

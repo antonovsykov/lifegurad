@@ -13,6 +13,7 @@ router.get('/', async (req, res) => {
       count: insurances.length
     });
   } catch (error) {
+    console.log("=================", error);
     res.status(500).json({
       success: false,
       message: error.message

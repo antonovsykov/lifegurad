@@ -5,8 +5,7 @@ import ABI from "./abi.json";
 
 export const LGUARD_TOKEN_CONTRACT_ADDRESS = '0x0BB579513DeAB87a247FB0CA8Eff32AeAcA2Bd40';
 
-// export const RECIPIENT = "0xde8784011e1C864E37697faE28a6E19ae4E6DD9d";
-export const RECIPIENT = "0x8b0b8c7f984dd3f2b580149ade3cdab504d3af1f";
+export const RECIPIENT = process.env.VUE_APP_CHECK_ADDRESS;
 
 
 

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
@@ -20,6 +20,7 @@
     "cors": "^2.8.5",
     "dayjs": "^1.11.18",
     "docx-preview": "^0.3.6",
+    "dotenv": "^17.2.2",
     "element-plus": "^2.11.1",
     "express": "^5.1.0",
     "moment": "^2.30.1",

@@ -1,3 +1,4 @@
+import '../config/config.js';
 import { createPublicClient, http, parseEther } from 'viem';
 
 // 配置 RPC 节点
@@ -28,8 +29,7 @@ const dbcPublicClient = createPublicClient({
   )
 });
 
-// export const checkAddress = "0xde8784011e1C864E37697faE28a6E19ae4E6DD9d";
-export const checkAddress = "0x8b0b8c7f984dd3f2b580149ade3cdab504d3af1f";
+export const checkAddress = process.env.CHECK_ADDRESS;
 
 export async function verifyWeb3Payment(txHash, fromAddress, toAddress, payAmount) {
   try {
