@@ -1,1 +1,1 @@
-export const WEBUI_BASE_URL = process.env.VUE_APP_API_URL;
+export const WEBUI_BASE_URL = window.location.origin;
