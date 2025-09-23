@@ -215,6 +215,7 @@ function checkDomLang() {
 
 onBeforeMount(async () => {
   await getInsurance();
+  checkDomLang();
 });
 
 onMounted(() => {
