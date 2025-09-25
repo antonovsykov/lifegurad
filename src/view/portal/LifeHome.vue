@@ -97,7 +97,7 @@
       </p>
       <p id="view-details-id" class="view-details" data-en="View Details" data-zh="查看详情" @click="viewDetails">View
         Details</p>
-      <button v-if="createStatus" :disabled="createStatus" data-en="Confirm and Pay..." data-zh="确认支付..." @click="creatOrder">Confirm and Pay...</button>
+      <button v-if="createStatus" :disabled="createStatus">{{ t("confirmandpay...") }}</button>
       <button v-else data-en="Confirm and Pay" data-zh="确认支付" @click="creatOrder">Confirm and Pay</button>
     </div>
   </div>
