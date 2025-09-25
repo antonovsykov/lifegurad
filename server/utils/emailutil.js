@@ -1,12 +1,13 @@
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.qq.com',
-  port: 465, // QQ邮箱SMTP端口，465用于SSL
-  secure: true, // 使用SSL
+  // service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false,
   auth: {
-    user: '2815206703@qq.com', // 你的QQ邮箱地址
-    pass: 'whaerxqlfcrzdfgi' // 你的QQ邮箱授权码，不是登录密码
+    user: process.env.STMP_EMAIL, // 你的邮箱地址
+    pass: process.env.STMP_PASSWORD // 你的邮箱授权码，不是登录密码
   }
 });
 

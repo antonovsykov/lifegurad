@@ -128,7 +128,8 @@ const messages = {
     'ror10': '10% yield',
     'ror15': '15% yield',
     'ror20': '20% yield',
-    'ror50': '50% yield'
+    'ror50': '50% yield',
+    'confirmandpay...': 'Confirm and Pay...'
   },
   zh: {
     title: '基于区块链的代币化智能保险平台',
@@ -256,7 +257,8 @@ const messages = {
     'ror10': '收益率10%',
     'ror15': '收益率15%',
     'ror20': '收益率20%',
-    'ror50': '收益率50%'
+    'ror50': '收益率50%',
+    'confirmandpay...': '确认支付...'
   }
 }
 
