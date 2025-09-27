@@ -41,6 +41,7 @@ export async function handleTransfer(address: string, amount: number) {
     })
     return result
   } catch (err) {
+    console.log("=====================", err);
     return null;
   }
 }
@@ -61,6 +62,7 @@ export async function checkTransfer(hash: string) {
       return false;
     }
   } catch (err) {
+    console.log("========================", err);
     return false;
   }
 }

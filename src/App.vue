@@ -16,11 +16,12 @@ createAppKit({
     connectMethodsOrder: ['wallet'],
     analytics: true, // Optional - defaults to your Cloud configuration
   },
+  storage: 'localStorage',
   metadata: {
     name: 'LifeGurad',
     description: 'AppKit Vue Example',
     url: 'https://reown.com/appkit',
-    icons: ['https://avatars.githubusercontent.com/u/179229932?s=200&v=4']
+    icons: ['https://www.lifeguard.chat/logo.png']
   },
   themeVariables: {
     '--w3m-accent': '#000000',
