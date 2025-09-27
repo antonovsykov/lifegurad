@@ -102,6 +102,10 @@ router.post('/', async (req, res) => {
 router.get('/sendemail', async (req, res) => {
   try {
     sendEmail("240892907@qq.com", "<div>123123123</div>")
+    res.json({
+      success: true,
+      message: "Send Success"
+    })
   } catch (error) {
     res.status(500).json({
       success: false,
