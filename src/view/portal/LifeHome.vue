@@ -285,7 +285,6 @@ const creatOrder = async () => {
     }
   }).catch((err) => {
     createStatus.value = false;
-    console.log("=======payerr=====", err)
     ElMessage.success(t('failedinsured'))
   });
 }
