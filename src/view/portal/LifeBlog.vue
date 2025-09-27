@@ -90,7 +90,7 @@ const formateDate = (datetime) => {
   margin: 24px auto;
   padding: 0 16px;
   margin-bottom: 80px;
-  min-height: calc(100vh - 300px);
+  min-height: calc(100vh - 260px);
 }
 
 .article-grid {

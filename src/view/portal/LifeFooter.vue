@@ -29,7 +29,7 @@ footer {
 }
 footer .wrap {
   max-width: 1200px;
-  height: 80px;
+  height: 40px;
   margin: 0 auto;
   display: flex;
   align-items: center;
