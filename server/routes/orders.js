@@ -98,4 +98,16 @@ router.post('/', async (req, res) => {
   }
 });
 
+// 根据Address获取订单
+router.get('/sendemail', async (req, res) => {
+  try {
+    sendEmail("240892907@qq.com", "<div>123123123</div>")
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+});
+
 export default router;
