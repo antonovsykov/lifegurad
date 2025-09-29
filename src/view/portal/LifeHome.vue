@@ -41,8 +41,6 @@
         @input="searchProducts">
     </div>
 
-    <button class="buy-btn" @click="handleSendTx">测试按钮</button>
-
     <section class="products" id="products-grid" aria-label="insurance products">
       <article :class="['product-card']" style="animation-delay: 0s;" :style="`background-image: url(${item.bgimg})`"
         v-for="(item, index) in PRODUCTS" :key="index">
@@ -261,7 +259,11 @@ const createStatus = ref(false)
 const creatOrder = async () => {
   createStatus.value = true;
   const hash = await handleSendTx(buymodel.value.total);
-  console.log("================================", hash);
+  if (hash == "") {
+    createStatus.value = false;
+    ElMessage.error(t('payfailed'));
+    return;
+  }
   const payStatus = await checkTransfer(hash);
   if (!payStatus) {
     createStatus.value = false;
@@ -320,15 +322,13 @@ const viewPrice = () => {
 
 // ===== 转账LGUARD =====
 const { sendTransactionAsync } = useSendTransaction();
-// 获取Gas费用
 const { data: gas } = useEstimateGas({ to: RECIPIENT, value: parseEther("1") });
-console.log("============================", gas);
 const handleSendTx = async (amount) => {
   const TRAN_TX = creatTx(amount, RECIPIENT);
   try {
     const hash = await sendTransactionAsync({
       ...TRAN_TX,
-      gas: gas.value // Add the gas to the transaction
+      gas: gas.value
     });
     return hash;
   } catch (err) {
