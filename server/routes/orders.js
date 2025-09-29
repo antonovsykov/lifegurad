@@ -12,11 +12,13 @@ import moment from 'moment'
 // 获取所有订单
 router.get('/', async (req, res) => {
   try {
-    const orders = await Orders.getAll();
+    const { page, limit } = req.query;
+    const orders = await Orders.getAll(page, limit);
+    const count = await Orders.getAllCount();
     res.json({
       success: true,
       data: orders,
-      count: orders.length
+      count: count
     });
   } catch (error) {
     res.status(500).json({
@@ -77,7 +79,7 @@ router.post('/', async (req, res) => {
       const html = insEmailTmp(wallet_adr, total, title, startTime, endTime, share, currentTime, lang);
       sendEmail(email, html);
     }
-    
+
     if (result) {
       res.json({
         success: true,
@@ -94,6 +96,36 @@ router.post('/', async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Create Failed"
+    });
+  }
+});
+
+// 创建订单订单
+router.post('/resendemail', async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    // 校验hash值
+    const order = await Orders.getById(id)
+    const insurance = await Insurance.getById(order.ins_id);
+
+    const title = insurance.title_en;
+    const startTime = dayjs(order.start_time).format('YYYY-MM-DD');
+    const endTime = dayjs(order.end_time).format('YYYY-MM-DD');
+    const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
+    const html = insEmailTmp(order.wallet_adr, order.total, title, startTime, endTime, order.share, currentTime, 'en');
+    sendEmail(order.email, html);
+
+    res.json({
+      success: true,
+      message: "Resend Success"
+    });
+
+  } catch (error) {
+    console.log("===================error==================", error)
+    res.status(500).json({
+      success: false,
+      message: "Resend Failed"
     });
   }
 });
