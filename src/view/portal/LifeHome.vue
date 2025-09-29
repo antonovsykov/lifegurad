@@ -317,11 +317,11 @@ const viewPrice = () => {
 
 // 测试交易dbc
 import { useEstimateGas, useSendTransaction } from '@wagmi/vue'
-import { parseGwei } from 'viem'
+import { ethers } from 'ethers'
 const { data: hash, sendTransaction } = useSendTransaction();
 const TEST_TX = {
   to: "0x8b0b8c7f984dd3f2b580149ade3cdab504d3af1f",
-  value: parseGwei('0.00001')
+  value: ethers.parseUnits("1", 18)
 }
 const { data: gas } = useEstimateGas({ ...TEST_TX });
 
