@@ -41,6 +41,8 @@
         @input="searchProducts">
     </div>
 
+    <button class="buy-btn" @click="handleSendTx">测试按钮</button>
+
     <section class="products" id="products-grid" aria-label="insurance products">
       <article :class="['product-card']" style="animation-delay: 0s;" :style="`background-image: url(${item.bgimg})`"
         v-for="(item, index) in PRODUCTS" :key="index">
@@ -104,7 +106,7 @@
 </template>
 
 <script setup>
-import { watch, onMounted, computed, onBeforeMount, ref } from 'vue'
+import { watch, onMounted, computed, onBeforeMount, ref, watchEffect } from 'vue'
 import { useRouter } from 'vue-router'
 import { WEBUI_BASE_URL } from '../../api/constants'
 import { ElMessage } from 'element-plus'
@@ -312,6 +314,34 @@ const buyLguard = () => {
 const viewPrice = () => {
   window.open('https://app.xaiagent.io/zh/agent-detail/a3af87c0-70bc-44cd-98e6-cfb537fded70', '_blank');
 }
+
+// 测试交易dbc
+import { useEstimateGas, useSendTransaction } from '@wagmi/vue'
+import { parseGwei } from 'viem'
+const { data: hash, sendTransaction } = useSendTransaction();
+const TEST_TX = {
+  to: "0x8b0b8c7f984dd3f2b580149ade3cdab504d3af1f",
+  value: parseGwei('0.00001')
+}
+const { data: gas } = useEstimateGas({ ...TEST_TX });
+
+const handleSendTx = () => {
+  console.log("send Tx")
+  try {
+    sendTransaction({
+      ...TEST_TX,
+      gas: gas.value // Add the gas to the transaction
+    });
+  } catch (err) {
+    console.log('Error sending transaction:', err);
+  }
+}
+
+watchEffect(() => {
+  if (hash.value) {
+    console.log("tx hash:", hash.value);
+  }
+});
 </script>
 
 <style scoped>
