@@ -1,3 +1,4 @@
+import { duration } from 'moment'
 import { createI18n } from 'vue-i18n'
 
 // 准备语言包
@@ -129,7 +130,18 @@ const messages = {
     'ror15': '15% yield',
     'ror20': '20% yield',
     'ror50': '50% yield',
-    'confirmandpay...': 'Confirm and Pay...'
+    'confirmandpay...': 'Confirm and Pay...',
+    insname: 'Insurance Name',
+    walletaddress: 'Wallet Address',
+    insduration: 'Duration',
+    insshare: 'Shares',
+    tranhash: 'Hash',
+    starttime: 'Start Time',
+    endtime: 'End Time',
+    email: 'Email',
+    resendemail: 'Resend Email',
+    resendsuccess: 'Resend Success',
+    resendfailed: 'Resend Failed'
   },
   zh: {
     title: '基于区块链的代币化智能保险平台',
@@ -258,7 +270,18 @@ const messages = {
     'ror15': '收益率15%',
     'ror20': '收益率20%',
     'ror50': '收益率50%',
-    'confirmandpay...': '确认支付...'
+    'confirmandpay...': '确认支付...',
+    insname: '险种名称',
+    walletaddress: '钱包地址',
+    insduration: '持续时间',
+    insshare: '份额',
+    tranhash: 'Hash',
+    starttime: '开始时间',
+    endtime: '结束时间',
+    email: '邮箱',
+    resendemail: '补发邮件',
+    resendsuccess: '补发成功',
+    resendfailed: '补发失败'
   }
 }
 

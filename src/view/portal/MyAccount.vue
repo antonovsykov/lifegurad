@@ -170,6 +170,12 @@ const formatNumber = (num) => {
   margin-right: 5px;
 }
 
+.balance-address span {
+  width: 100%;
+  white-space: normal;
+  word-break: break-all;
+}
+
 .balance-info {
   display: flex;
   align-items: center;

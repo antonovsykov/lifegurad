@@ -7,14 +7,26 @@ import Earnings from './earnings.js';
 class Orders {
 
   // 获取所有订单
-  static async getAll() {
+  static async getAll(page, limit) {
     try {
       const result = await db.query(
-        'SELECT * FROM orders order by create_at asc'
+        'SELECT o.*, i.title_en, i.title_zh, i.brief_en, i.brief_zh, i.bgimg FROM orders o left join insurance i on o.ins_id = i.id order by o.create_at desc LIMIT $1 OFFSET $2', [limit, (page - 1) * limit]
       );
       return result.rows;
     } catch (error) {
       throw new Error(`获取险种列表失败: ${error.message}`);
+    }
+  }
+
+  // 获取所有博客总条数
+  static async getAllCount() {
+    try {
+      const result = await db.query(
+        'SELECT COUNT(*) AS total FROM orders '
+      );
+      return parseInt(result.rows[0].total, 10);
+    } catch (error) {
+      throw new Error(`获取博客列表失败: ${error.message}`);
     }
   }
 
@@ -24,7 +36,7 @@ class Orders {
     return result.rows[0];
   }
 
-   // 根据ID获取订单
+  // 根据ID获取订单
   static async getByHash(hash) {
     const result = await db.query('SELECT * FROM orders WHERE hash = $1', [hash]);
     return result.rows[0];
@@ -48,7 +60,7 @@ class Orders {
   }
 
   // 创建订单
-  static async create({ ins_id, wallet_adr, duration, share, money, total, hash, email, paystatus}) {
+  static async create({ ins_id, wallet_adr, duration, share, money, total, hash, email, paystatus }) {
     try {
       const orderId = uuidv4();
       const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
@@ -56,7 +68,7 @@ class Orders {
 
       const earning = await Earnings.getById(ins_id);
       const months = JSON.parse(earning.months);
-      const targetData = months.find(item => {return item && item.num === duration; });
+      const targetData = months.find(item => { return item && item.num === duration; });
       let nums = 1;
       let paymoney = 0;
       let paytotal = 0;
