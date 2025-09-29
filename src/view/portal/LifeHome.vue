@@ -289,7 +289,7 @@ const creatOrder = async () => {
         ElMessage.success(t('failedinsured'));
       }
     } else {
-      ElMessage.success(t('failedinsured'));
+      ElMessage.error(t('failedinsured'));
     }
   }).catch((err) => {
     createStatus.value = false;
