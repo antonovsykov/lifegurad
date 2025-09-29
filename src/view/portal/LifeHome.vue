@@ -320,11 +320,15 @@ const viewPrice = () => {
 
 // ===== 转账LGUARD =====
 const { sendTransactionAsync } = useSendTransaction();
+// 获取Gas费用
+const { data: gas } = useEstimateGas({ to: RECIPIENT, value: parseEther("1") });
+console.log("============================", gas);
 const handleSendTx = async (amount) => {
-  const TRAN_TX = await creatTx(amount, RECIPIENT);
+  const TRAN_TX = creatTx(amount, RECIPIENT);
   try {
     const hash = await sendTransactionAsync({
-      ...TRAN_TX
+      ...TRAN_TX,
+      gas: gas.value // Add the gas to the transaction
     });
     return hash;
   } catch (err) {

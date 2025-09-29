@@ -75,8 +75,7 @@ export async function checkTransfer(hash: string) {
 const provider = new ethers.JsonRpcProvider(rpcUrl);
 const lguardContract = new ethers.Contract(LGUARD_TOKEN_CONTRACT_ADDRESS, ABI?.abi, provider);
 
-export const creatTx = async (amount: string, address: string) => {
-  const gasPrice = (await provider.getFeeData()).gasPrice;
+export const creatTx = (amount: string, address: string) => {
   const amountStr = String(amount);
   const TEST_TX = {
     to: LGUARD_TOKEN_CONTRACT_ADDRESS,
@@ -84,8 +83,7 @@ export const creatTx = async (amount: string, address: string) => {
     data: lguardContract.interface.encodeFunctionData("transfer", [
       address,
       parseEther(amountStr)
-    ]),
-    gas: gasPrice
+    ])
   }
   return TEST_TX;
 }
