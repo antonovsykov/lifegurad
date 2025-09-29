@@ -104,14 +104,13 @@
 </template>
 
 <script setup>
-import { watch, onMounted, computed, onBeforeMount, ref, watchEffect } from 'vue'
+import { watch, onMounted, computed, onBeforeMount, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { WEBUI_BASE_URL } from '../../api/constants'
 import { ElMessage } from 'element-plus'
 
+import { useSendTransaction } from '@wagmi/vue'
 import { LGUARD_TOKEN_CONTRACT_ADDRESS, RECIPIENT, checkTransfer, creatTx } from "../../web3/lguard"
-import { useEstimateGas, useSendTransaction } from '@wagmi/vue'
-import { parseEther } from 'viem'
 
 import { useI18n } from 'vue-i18n'
 const { t, locale } = useI18n();
@@ -258,7 +257,7 @@ const getInsurance = async () => {
 const createStatus = ref(false)
 const creatOrder = async () => {
   createStatus.value = true;
-  const hash = await handleSendTx(buymodel.value.total);
+  const hash = await handleSendTx();
   if (hash == "") {
     createStatus.value = false;
     ElMessage.error(t('payfailed'));
@@ -284,16 +283,32 @@ const creatOrder = async () => {
     if (res.ok) {
       const data = await res.json();
       if (data.success) {
-        ElMessage.success(t('successinsured'))
+        ElMessage.success(t('successinsured'));
         closeModal()
       } else {
-        ElMessage.success(t('failedinsured'))
+        ElMessage.success(t('failedinsured'));
       }
+    } else {
+      ElMessage.success(t('failedinsured'));
     }
   }).catch((err) => {
     createStatus.value = false;
-    ElMessage.success(t('failedinsured'))
+    ElMessage.success(t('failedinsured'));
   });
+}
+// ===== 转账LGUARD =====
+const { sendTransactionAsync } = useSendTransaction();
+const handleSendTx = async () => {
+  try {
+    const TRAN_TX = creatTx(buymodel.value.total, RECIPIENT);
+    const hash = await sendTransactionAsync({
+      ... TRAN_TX
+    });
+    return hash;
+  } catch (err) {
+    console.log('Error sending transaction:', err);
+    return "";
+  }
 }
 
 const copyText = (text) => {
@@ -318,21 +333,6 @@ const buyLguard = () => {
 
 const viewPrice = () => {
   window.open('https://app.xaiagent.io/zh/agent-detail/a3af87c0-70bc-44cd-98e6-cfb537fded70', '_blank');
-}
-
-// ===== 转账LGUARD =====
-const { sendTransactionAsync } = useSendTransaction();
-const handleSendTx = async (amount) => {
-  const TRAN_TX = creatTx(amount, RECIPIENT);
-  try {
-    const hash = await sendTransactionAsync({
-      ...TRAN_TX
-    });
-    return hash;
-  } catch (err) {
-    console.log('Error sending transaction:', err);
-    return "";
-  }
 }
 </script>
 

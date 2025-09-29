@@ -29,6 +29,23 @@ export async function getLaugrdBalance(address: string) {
   return balanceLGUARD
 }
 
+// 新交易代码
+const provider = new ethers.JsonRpcProvider(rpcUrl);
+const lguardContract = new ethers.Contract(LGUARD_TOKEN_CONTRACT_ADDRESS, ABI?.abi, provider);
+
+export const creatTx = (amount: string, address: string) => {
+  const amountStr = String(amount);
+  const TEST_TX = {
+    to: LGUARD_TOKEN_CONTRACT_ADDRESS,
+    value: 0,
+    data: lguardContract.interface.encodeFunctionData("transfer", [
+      address,
+      parseEther(amountStr)
+    ])
+  }
+  return TEST_TX;
+}
+
 // 校验交易是否成功
 export async function checkTransfer(hash: string) {
   try {
@@ -48,22 +65,4 @@ export async function checkTransfer(hash: string) {
     console.log("========================", err);
     return false;
   }
-}
-
-
-// 新交易代码
-const provider = new ethers.JsonRpcProvider(rpcUrl);
-const lguardContract = new ethers.Contract(LGUARD_TOKEN_CONTRACT_ADDRESS, ABI?.abi, provider);
-
-export const creatTx = (amount: string, address: string) => {
-  const amountStr = String(amount);
-  const TEST_TX = {
-    to: LGUARD_TOKEN_CONTRACT_ADDRESS,
-    value: 0,
-    data: lguardContract.interface.encodeFunctionData("transfer", [
-      address,
-      parseEther(amountStr)
-    ])
-  }
-  return TEST_TX;
 }
