@@ -111,7 +111,9 @@ import { useRouter } from 'vue-router'
 import { WEBUI_BASE_URL } from '../../api/constants'
 import { ElMessage } from 'element-plus'
 
-import { LGUARD_TOKEN_CONTRACT_ADDRESS, handleTransfer, RECIPIENT, checkTransfer, creatTx } from "../../web3/lguard"
+import { LGUARD_TOKEN_CONTRACT_ADDRESS, RECIPIENT, checkTransfer, creatTx } from "../../web3/lguard"
+import { useEstimateGas, useSendTransaction } from '@wagmi/vue'
+import { parseEther } from 'viem'
 
 import { useI18n } from 'vue-i18n'
 const { t, locale } = useI18n();
@@ -258,7 +260,8 @@ const getInsurance = async () => {
 const createStatus = ref(false)
 const creatOrder = async () => {
   createStatus.value = true;
-  const hash = await handleTransfer(RECIPIENT, buymodel.value.total);
+  const hash = await handleSendTx(buymodel.value.total);
+  console.log("================================", hash);
   const payStatus = await checkTransfer(hash);
   if (!payStatus) {
     createStatus.value = false;
@@ -315,29 +318,20 @@ const viewPrice = () => {
   window.open('https://app.xaiagent.io/zh/agent-detail/a3af87c0-70bc-44cd-98e6-cfb537fded70', '_blank');
 }
 
-// 测试交易dbc
-import { useEstimateGas, useSendTransaction } from '@wagmi/vue'
-const { data: hash, sendTransaction } = useSendTransaction();
-
-const handleSendTx = () => {
-  console.log("send Tx")
-  const TEST_TX = creatTx("100");
-  const { data: gas } = useEstimateGas({ ...TEST_TX });
+// ===== 转账LGUARD =====
+const { sendTransactionAsync } = useSendTransaction();
+const handleSendTx = async (amount) => {
+  const TRAN_TX = await creatTx(amount, RECIPIENT);
   try {
-    sendTransaction({
-      ...TEST_TX,
-      gas: gas.value // Add the gas to the transaction
+    const hash = await sendTransactionAsync({
+      ...TRAN_TX
     });
+    return hash;
   } catch (err) {
     console.log('Error sending transaction:', err);
+    return "";
   }
 }
-
-watchEffect(() => {
-  if (hash.value) {
-    console.log("tx hash:", hash.value);
-  }
-});
 </script>
 
 <style scoped>
