@@ -322,13 +322,11 @@ const viewPrice = () => {
 
 // ===== 转账LGUARD =====
 const { sendTransactionAsync } = useSendTransaction();
-const { data: gas } = useEstimateGas({ to: RECIPIENT, value: parseEther("1") });
 const handleSendTx = async (amount) => {
   const TRAN_TX = creatTx(amount, RECIPIENT);
   try {
     const hash = await sendTransactionAsync({
-      ...TRAN_TX,
-      gas: gas.value
+      ...TRAN_TX
     });
     return hash;
   } catch (err) {
