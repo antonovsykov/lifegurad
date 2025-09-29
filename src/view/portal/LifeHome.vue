@@ -111,7 +111,7 @@ import { useRouter } from 'vue-router'
 import { WEBUI_BASE_URL } from '../../api/constants'
 import { ElMessage } from 'element-plus'
 
-import { LGUARD_TOKEN_CONTRACT_ADDRESS, handleTransfer, RECIPIENT, checkTransfer } from "../../web3/lguard"
+import { LGUARD_TOKEN_CONTRACT_ADDRESS, handleTransfer, RECIPIENT, checkTransfer, creatTx } from "../../web3/lguard"
 
 import { useI18n } from 'vue-i18n'
 const { t, locale } = useI18n();
@@ -317,16 +317,12 @@ const viewPrice = () => {
 
 // 测试交易dbc
 import { useEstimateGas, useSendTransaction } from '@wagmi/vue'
-import { ethers } from 'ethers'
 const { data: hash, sendTransaction } = useSendTransaction();
-const TEST_TX = {
-  to: "0x8b0b8c7f984dd3f2b580149ade3cdab504d3af1f",
-  value: ethers.parseUnits("1", 18)
-}
-const { data: gas } = useEstimateGas({ ...TEST_TX });
 
 const handleSendTx = () => {
   console.log("send Tx")
+  const TEST_TX = creatTx("100");
+  const { data: gas } = useEstimateGas({ ...TEST_TX });
   try {
     sendTransaction({
       ...TEST_TX,

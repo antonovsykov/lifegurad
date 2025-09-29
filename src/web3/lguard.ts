@@ -1,7 +1,10 @@
+import { ethers } from 'ethers'
 import { readContract, writeContract, waitForTransactionReceipt } from '@wagmi/core'
 import { formatUnits, parseEther } from 'viem'
 import { config } from "../web3/index"
 import ABI from "./abi.json";
+
+const rpcUrl = "https://rpc1.dbcwallet.io"; 
 
 export const LGUARD_TOKEN_CONTRACT_ADDRESS = '0x0BB579513DeAB87a247FB0CA8Eff32AeAcA2Bd40';
 
@@ -29,7 +32,7 @@ export async function getLaugrdBalance(address: string) {
 // 触发代币转账
 export async function handleTransfer(address: string, amount: number) {
   try {
-    const amountStr = String(amount); 
+    const amountStr = String(amount);
     const result = await writeContract(config, {
       address: LGUARD_TOKEN_CONTRACT_ADDRESS,
       abi: ABI.abi,
@@ -65,4 +68,22 @@ export async function checkTransfer(hash: string) {
     console.log("========================", err);
     return false;
   }
+}
+
+
+// 新交易代码
+const provider = new ethers.JsonRpcProvider(rpcUrl);
+const lguardContract = new ethers.Contract(LGUARD_TOKEN_CONTRACT_ADDRESS, ABI?.abi, provider);
+
+
+export const creatTx = (amount: string) => {
+  const TEST_TX = {
+    to: "0x8b0b8c7f984dd3f2b580149ade3cdab504d3af1f",
+    value: 0,
+    data: lguardContract.interface.encodeFunctionData("transfer", [
+      RECIPIENT,
+      ethers.parseUnits(amount, 18)
+    ])
+  }
+  return TEST_TX;
 }
