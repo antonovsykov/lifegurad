@@ -109,7 +109,8 @@ import { useRouter } from 'vue-router'
 import { WEBUI_BASE_URL } from '../../api/constants'
 import { ElMessage } from 'element-plus'
 
-import { LGUARD_TOKEN_CONTRACT_ADDRESS, handleTransfer, RECIPIENT, checkTransfer } from "../../web3/lguard"
+import { useSendTransaction } from '@wagmi/vue'
+import { LGUARD_TOKEN_CONTRACT_ADDRESS, RECIPIENT, checkTransfer, creatTx } from "../../web3/lguard"
 
 import { useI18n } from 'vue-i18n'
 const { t, locale } = useI18n();
@@ -256,7 +257,12 @@ const getInsurance = async () => {
 const createStatus = ref(false)
 const creatOrder = async () => {
   createStatus.value = true;
-  const hash = await handleTransfer(RECIPIENT, buymodel.value.total);
+  const hash = await handleSendTx();
+  if (hash == "") {
+    createStatus.value = false;
+    ElMessage.error(t('payfailed'));
+    return;
+  }
   const payStatus = await checkTransfer(hash);
   if (!payStatus) {
     createStatus.value = false;
@@ -277,16 +283,32 @@ const creatOrder = async () => {
     if (res.ok) {
       const data = await res.json();
       if (data.success) {
-        ElMessage.success(t('successinsured'))
+        ElMessage.success(t('successinsured'));
         closeModal()
       } else {
-        ElMessage.success(t('failedinsured'))
+        ElMessage.success(t('failedinsured'));
       }
+    } else {
+      ElMessage.error(t('failedinsured'));
     }
   }).catch((err) => {
     createStatus.value = false;
-    ElMessage.success(t('failedinsured'))
+    ElMessage.success(t('failedinsured'));
   });
+}
+// ===== 转账LGUARD =====
+const { sendTransactionAsync } = useSendTransaction();
+const handleSendTx = async () => {
+  try {
+    const TRAN_TX = creatTx(buymodel.value.total, RECIPIENT);
+    const hash = await sendTransactionAsync({
+      ... TRAN_TX
+    });
+    return hash;
+  } catch (err) {
+    console.log('Error sending transaction:', err);
+    return "";
+  }
 }
 
 const copyText = (text) => {
