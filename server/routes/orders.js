@@ -76,7 +76,7 @@ router.post('/', async (req, res) => {
       const startTime = dayjs(order.start_time).format('YYYY-MM-DD');
       const endTime = dayjs(order.end_time).format('YYYY-MM-DD');
       const currentTime = moment().format('YYYY-MM-DD HH:mm:ss');
-      const html = insEmailTmp(wallet_adr, total, title, startTime, endTime, share, currentTime, lang);
+      const html = insEmailTmp(ins_id, wallet_adr, total, title, startTime, endTime, share, currentTime, lang);
       sendEmail(email, html);
     }
 
